@@ -1,4 +1,4 @@
-# spines
+# Spines
 
 **Skeletons for parameterized models.**
 
