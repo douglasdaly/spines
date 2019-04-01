@@ -28,6 +28,7 @@ setup(
     description='Skeletons for parameterized models.',
     packages=find_packages(include=['spines', 'spines.*']),
     long_description=read('README.md'),
+    long_description_content_type='text/markdown',
 
     author='Douglas Daly',
     author_email='me@douglasdaly.com',
