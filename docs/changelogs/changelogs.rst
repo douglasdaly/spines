@@ -9,8 +9,11 @@ The format is based on
 adheres to `Semantic Versioning <https://semver.org/spec/v2.0.0.html>`_.
 
 
-**Changelogs:**
+Pre-Alpha
+=========
 
 .. toctree::
     :maxdepth: 1
 
+    prealpha/changelog_1
+    prealpha/changelog_2

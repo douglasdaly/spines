@@ -47,6 +47,7 @@ templates_path = ['_templates']
 # This pattern also affects html_static_path and html_extra_path.
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
+master_doc = 'index'
 
 # -- Options for HTML output -------------------------------------------------
 
@@ -66,7 +67,7 @@ html_theme_options = {
     'display_version': True,
     'prev_next_buttons_location': 'bottom',
     'style_external_links': False,
-    #'style_nav_header_background': 'white',
+    #'style_nav_header_background': '#161616',
     # Toc options
     'collapse_navigation': True,
     'sticky_navigation': True,
@@ -78,3 +79,6 @@ html_theme_options = {
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
+
+# Additional options
+html_logo = '_static/images/spines_logo_200.png'

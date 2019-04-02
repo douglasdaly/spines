@@ -24,7 +24,7 @@ class ModelTestImpl(Model):
     def fit(self):
         return
 
-    def predict(self):
+    def transform(self):
         return
 
 

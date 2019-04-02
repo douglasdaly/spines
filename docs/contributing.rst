@@ -15,6 +15,9 @@ note when making contributions:
 - This project follows the PEP8 standards for code style and all new code must
   follow the same conventions.
 
+- Please conduct yourself in a polite and respectful manner, in accordance with
+  the project's :doc:`code of conduct <conduct>`.
+
 First fork the repository to create a copy to make your changes on.  Once
 you've finished your contribution you will need to ensure that the project's
 unit tests all pass and that the code passes flake8 and coverage tests.

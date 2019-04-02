@@ -40,7 +40,7 @@ class Model(object, metaclass=ABCMeta):
         return self.__class__.__name__
 
     def __call__(self, *args, **kwargs):
-        return self.predict(*args, **kwargs)
+        return self.transform(*args, **kwargs)
 
     # Properties
 
@@ -520,27 +520,21 @@ class Model(object, metaclass=ABCMeta):
 
     # Abstract methods
 
-    def construct(self, *args, **kwargs):
-        """Constructs the model
+    def build(self, *args, **kwargs):
+        """Builds the model for use
 
-        Constructs the model based on the set `parameters` (if needed).
+        Initializes the model for use in fitting and/or transformations.
 
         Parameters
         ----------
         args : optional
-            Any additional arguments to use in construction call.
+            Any additional arguments to use in the build call.
         kwargs : optional
-            Any additional keyword arguments to use in construction call.
-
-        Returns
-        -------
-        bool
-            Result of model construction (success or failure).
+            Any additional keyword arguments to use in the build call.
 
         """
-        return True
+        return
 
-    @abstractmethod
     def fit(self, *args, **kwargs):
         """Fits the model
 
@@ -554,31 +548,27 @@ class Model(object, metaclass=ABCMeta):
         kwargs : optional
             Any additional keyword arguments to use in fit call.
 
-        Returns
-        -------
-        bool
-            Result of the training operation (success or failure).
-
         """
-        pass
+        return
 
     @abstractmethod
-    def predict(self, *args, **kwargs):
-        """Predict outputs
+    def transform(self, *args, **kwargs):
+        """Transform inputs into outputs
 
-        For the given input(s), run the trained model to generate outputs.
+        For the given input(s), use the model to generate outputs.  This is
+        also known as "predict"
 
         Parameters
         ----------
         args : optional
-            Additional parameter to pass to prediction call.
+            Additional parameter to pass to transform call.
         kwargs : optional
-            Additional keyword arguments to pass to prediction call.
+            Additional keyword arguments to pass to transform call.
 
         Returns
         -------
         object
-            Predictions from the given `x` data.
+            Transformations from the given data.
 
         """
         pass
