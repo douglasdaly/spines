@@ -2,10 +2,10 @@
 Parameters
 ##########
 
-Spines models hold stores of :class:`spines.Parameter` objects.  These object
+Spines models hold stores of :class:`spines.Parameter` objects.  These objects
 specify parameters that the model requires as well as any restrictions or
-constraints on them.  There are different types of :class:`spines.Parameter`
-classes aside from the basic one, but they share these common attributes:
+constraints on them.  There are different types of parameter classes (aside
+from the base class), but all of them share these common attributes:
 
 name
     The name of the parameter.
@@ -19,3 +19,6 @@ required
 default
     An optional default value for the parameter if it's not otherwise
     specified.
+
+There are a number of helpers and mixins so that you can create parameter
+classes to suit your particular use case.
