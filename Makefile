@@ -18,8 +18,9 @@ GARBAGE_PATTERNS := *.pyc *~ *-checkpoint.ipynb
 GARBAGE := $(foreach DIR,$(DIRS),$(addprefix $(DIR)/,$(GARBAGE_PATTERNS)))
 
 FLAKE8 = flake8
-UNIT_TEST = pytest
+TOX = tox
 TWINE = twine
+UNIT_TEST = pytest
 
 ifeq ($(PKG_MGR), pipenv)
     RUN_PRE = pipenv run
@@ -33,8 +34,9 @@ endif
 
 PYTHON := $(RUN_PRE) $(PYTHON)
 FLAKE8 := $(RUN_PRE) $(FLAKE8)
-UNIT_TEST := $(RUN_PRE) $(UNIT_TEST)
+TOX := $(RUN_PRE) $(TOX)
 TWINE := $(RUN_PRE) $(TWINE)
+UNIT_TEST := $(RUN_PRE) $(UNIT_TEST)
 
 ###############################################################################
 # COMMANDS                                                                    #
@@ -45,7 +47,7 @@ TWINE := $(RUN_PRE) $(TWINE)
         clean clean-build \
 		changelog changelog-draft \
 		lint coverage \
-		test \
+		test test-tox \
 		build check-build release
 
 .DEFAULT-GOAL := help
@@ -106,12 +108,14 @@ coverage: ## Runs code coverage checks over the codebase
 test: ## Run the unit tests over the project
 	$(UNIT_TEST) tests/
 
+test-tox: ## Run the tox unit tests over the project
+	$(TOX)
+
 # Distribution
 
 build: clean-build ## Builds the library package
 	$(PYTHON) setup.py sdist
 	$(PYTHON) setup.py bdist_wheel
-	ls dist/
 
 check-build: ## Check the ubilt packages prior to uploading
 	$(TWINE) check dist/*
