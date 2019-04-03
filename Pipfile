@@ -4,16 +4,22 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 
 [dev-packages]
-
-[packages]
+spines = {editable = true,path = "."}
+coverage = "*"
+flake8 = "*"
+invoke = "*"
+pandoc = "*"
+parver = "*"
 pytest = "*"
+pytest-cov = "*"
 sphinx = "*"
 sphinx-rtd-theme = "*"
+towncrier = "*"
 twine = "*"
 versioneer = "*"
-pytest-cov = "*"
-coverage = "*"
 wheel = "*"
+
+[packages]
 
 [requires]
 python_version = "3.7"

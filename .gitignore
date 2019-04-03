@@ -22,6 +22,7 @@ var/
 *.egg-info/
 .installed.cfg
 *.egg
+pip-wheel-metadata/
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
@@ -66,6 +67,9 @@ target/
 
 # Pycharm
 .idea
+
+# VS Code
+.vscode
 
 # Jupyter NB Checkpoints
 .ipynb_checkpoints/

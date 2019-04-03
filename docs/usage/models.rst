@@ -2,10 +2,11 @@
 Models
 ######
 
-The core class of the ``spines`` package is the :class:`spines.Model` class.
-All models have three primary functions in common: ``build``, ``fit`` and
-``transform``.  You can implement as many additional functions as needed but
-these three lie at the heart of the ``spines`` library.
+The core class of the ``spines`` package is the :class:`spines.Model` 
+class. All models have three primary functions in common: ``build``, 
+``fit`` and ``transform``.  You can implement as many additional 
+functions as needed but these three lie at the heart of the ``spines`` 
+library.
 
 
 build
@@ -20,8 +21,8 @@ fit
 ===
 
 The ``fit`` function (aka train) takes input data and it's corresponding
-output data and fits the model.  This function is not required (though it
-is likely implemented for most use cases).
+output data and fits the model.  This function is not required (though 
+it is likely implemented for most use cases).
 
 
 transform

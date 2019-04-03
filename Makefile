@@ -12,7 +12,7 @@ PKG_MGR = pipenv
 # SETUP                                                                       #
 ###############################################################################
 
-SUBDIR_ROOTS := docs spines tests
+SUBDIR_ROOTS := docs src tests
 DIRS := . $(shell find $(SUBDIR_ROOTS) -type d)
 GARBAGE_PATTERNS := *.pyc *~ *-checkpoint.ipynb
 GARBAGE := $(foreach DIR,$(DIRS),$(addprefix $(DIR)/,$(GARBAGE_PATTERNS)))
@@ -23,8 +23,8 @@ TWINE = twine
 
 ifeq ($(PKG_MGR), pipenv)
     RUN_PRE = pipenv run
-    INSTALL_DEPENDENCIES = pipenv install
-    GENERATE_DEPENDENCIES = pipenv lock -r > requirements.txt
+    INSTALL_DEPENDENCIES = pipenv install --dev
+    GENERATE_DEPENDENCIES = pipenv lock --dev -r > requirements.txt
 else
     RUN_PRE =
     INSTALL_DEPENDENCIES = pip install -r requirements.txt
@@ -42,7 +42,11 @@ TWINE := $(RUN_PRE) $(TWINE)
 .PHONY: help \
         requirements requirements-generate \
         docs docs-clean \
-        clean lint test
+        clean clean-build \
+		changelog changelog-draft \
+		lint coverage \
+		test \
+		build check-build release
 
 .DEFAULT-GOAL := help
 
@@ -70,7 +74,7 @@ docs-clean: ## Cleans the generated documentation
 	@cd docs/ && $(RUN_PRE) make clean
 
 docs-apigen: ## Generates the API documentation files
-	@cd docs/ && $(RUN_PRE) sphinx-apidoc -e -M -o api ../spines
+	@cd docs/ && $(RUN_PRE) sphinx-apidoc -e -M -o api ../src/spines
 
 # Cleaning
 
@@ -81,22 +85,35 @@ clean-build: ## Clean out the compiled package files
 	@rm -rf build/*.*
 	@rm -rf dist/*.*
 
-# Packaging
+# Changes
+
+changelog: ## Generates the new CHANGELOG.md file
+	$(PYTHON) invoke release.changelog
+
+changelog-draft: ## Generates the draft new CHANGELOG.draft.md file
+	$(PYTHON) invoke release.changelog --draft
+
+# Code
 
 lint: ## Lint using flake8
-	$(FLAKE8) spines/
+	$(FLAKE8) src/spines/
 
 coverage: ## Runs code coverage checks over the codebase
-	$(UNIT_TEST) --cov=spines tests/
+	$(UNIT_TEST) --cov=src/spines tests/
+
+# Unit testing
 
 test: ## Run the unit tests over the project
 	$(UNIT_TEST) tests/
 
+# Distribution
+
 build: clean-build ## Builds the library package
 	$(PYTHON) setup.py sdist
 	$(PYTHON) setup.py bdist_wheel
+	ls dist/
 
-check: ## Check the ubilt packages prior to uploading
+check-build: ## Check the ubilt packages prior to uploading
 	$(TWINE) check dist/*
 
 upload: ## Uploads the package to the PyPI server

@@ -26,6 +26,7 @@ def read(file):
 setup(
     name='spines',
     description='Skeletons for parameterized models.',
+    package_dir={'': 'src'},
     packages=find_packages(include=['spines', 'spines.*']),
     long_description=read('README.md'),
     long_description_content_type='text/markdown',
