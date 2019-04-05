@@ -25,11 +25,10 @@ def read(file):
 
 setup(
     name='spines',
-    description='Skeletons for parameterized models.',
+    description='Backbones for parameterized models.',
     package_dir={'': 'src'},
-    packages=find_packages(include=['spines', 'spines.*']),
-    long_description=read('README.md'),
-    long_description_content_type='text/markdown',
+    packages=find_packages('src', include=['spines', 'spines.*']),
+    include_package_data=True,
 
     author='Douglas Daly',
     author_email='me@douglasdaly.com',
@@ -38,13 +37,18 @@ setup(
         'Source Code': 'https://www.github.com/douglasdaly/spines',
         'Documentation': 'https://spines.readthedocs.io/',
     },
+    long_description=read('README.md'),
+    long_description_content_type='text/markdown',
 
     version=versioneer.get_version(),
     cmdclass=versioneer.get_cmdclass(),
     tests_require=[
         'pytest',
+        'pytest-cov',
     ],
-    include_package_data=True,
+    setup_requires=[
+        'pytest-runner',
+    ],
 
     license='MIT',
     keywords="spines parameterized models",
