@@ -6,8 +6,8 @@ Base classes for model parameters.
 #   Imports
 #
 from abc import ABC
-from collections.abc import MutableMapping, Iterable
-from typing import Iterator
+from collections.abc import Iterable
+from typing import Type
 
 
 #
@@ -31,8 +31,6 @@ class Parameter(object):
 
     Parameters
     ----------
-    name : str
-        Name of the Parameter these options are for.
     value_type : :obj:`type` or :obj:`Iterable` of :obj:`type`
         The type(s) of values allowed for this parameter.
     required : bool, optional
@@ -42,8 +40,8 @@ class Parameter(object):
 
     """
 
-    def __init__(self, name, value_type, required=True, default=None):
-        self.name = name
+    def __init__(self, value_type, required=True, default=None):
+        self._name = None
         self.value_type = value_type
         self.required = required
         self.default = default
@@ -51,12 +49,11 @@ class Parameter(object):
     # dunder Methods
 
     def __call__(self, value):
-        """Checks the given value, raising exceptions if it isn't valid"""
         if self._check_helper(value, raise_exceptions=True):
-            return value
-        return
+            return True
+        return False
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return '<%s %s [type=%s] (%s)>' % (
             self.__class__.__name__,
             self.name,
@@ -64,10 +61,28 @@ class Parameter(object):
             ', '.join(self._disp_props())
         )
 
-    def __str__(self):
-        return self.name
+    def __str__(self) -> str:
+        return self._name
+
+    # Descriptor methods
+
+    def __set_name__(self, owner, name: str) -> None:
+        self._name = name
+        return
+
+    def __set__(self, instance: Type['spines.Model'], value) -> None:
+        instance.parameters[self._name] = value
+        return
+
+    def __get__(self, instance, owner):
+        return instance.parameters.get(self._name, None)
 
     # Properties
+
+    @property
+    def name(self) -> str:
+        """str: Name of this parameter"""
+        return self._name
 
     @property
     def value_type(self) -> tuple:
@@ -161,127 +176,17 @@ class Parameter(object):
         return ret
 
 
-class ParameterStore(MutableMapping):
+class HyperParameter(Parameter):
     """
-    Helper class for managing collections of Parameters.
+    Hyper-parameter
     """
 
-    def __init__(self):
-        self._params = dict()
-        self._values = dict()
+    def __set__(self, instance: Type['spines.Model'], value) -> None:
+        instance.hyper_parameters[self._name] = value
+        return
 
-    # dunder methods
-
-    def __setitem__(self, k: str, v: Parameter) -> None:
-        self._values[k] = self._params[k](v)
-
-    def __delitem__(self, v: str) -> None:
-        del self._values[v]
-
-    def __getitem__(self, k: str) -> Parameter:
-        return self._values[k]
-
-    def __len__(self) -> int:
-        return len(self._values)
-
-    def __iter__(self) -> Iterator[str]:
-        return iter(self._values)
-
-    # Properties
-
-    @property
-    def parameters(self) -> dict:
-        """dict: Copy of the current set of parameters."""
-        return self._params.copy()
-
-    @property
-    def values(self) -> dict:
-        """dict: Copy of the current set of parameter values."""
-        return self._values.copy()
-
-    @property
-    def valid(self) -> bool:
-        """bool: Whether or not this is a fully valid set of parameters."""
-        return self._validate_helper(raise_exceptions=False)
-
-    # Helper methods
-
-    def copy(self, deep=False):
-        """Returns a copy of this parameter store object.
-
-        Parameters
-        ----------
-        deep : bool, optional
-            Whether or not to do deep-copying of this stores contents.
-
-        Returns
-        -------
-        ParameterStore
-            Copied parameter store object.
-
-        """
-        new_obj = self.__class__()
-        for k, v in self._params:
-            new_obj.add(v)
-        for k, v in self._values:
-            new_obj[k] = v
-        return new_obj
-
-    def reset(self) -> None:
-        """Clears all of the parameters and options stored."""
-        self._values.clear()
-        self._params.clear()
-
-    # Option methods
-
-    def add(self, parameter: Parameter) -> None:
-        """Add a :class:`Parameter` specification to this store
-
-        Parameters
-        ----------
-        option : Parameter
-            :class:`Parameter` specification to add to this parameter
-            store.
-
-        Raises
-        ------
-        ParameterExistsError
-            If a parameter option with the same name already exists.
-
-        """
-        self._params[parameter.name] = parameter
-
-    def remove(self, name: str) -> Parameter:
-        """Removes a :class:`Parameter` specification
-
-        Parameters
-        ----------
-        name : str
-            Name of the :class:`Parameter` to remove.
-
-        Returns
-        -------
-        Parameter
-            The removed :class:`Parameter` specified.
-
-        Raises
-        ------
-        KeyError
-            If the given `name` does not exist.
-
-        """
-        if name in self._values.keys():
-            del self._values[name]
-        return self._params.pop(name)
-
-    def _validate_helper(self, raise_exceptions=False) -> bool:
-        """Helper to check if this set of parameters is valid"""
-        for k, v in self._params.items():
-            if v.required and k not in self._values.keys():
-                if raise_exceptions:
-                    raise MissingParameterException(k)
-                return False
-        return True
+    def __get__(self, instance: Type['spines.Model'], owner):
+        return instance.hyper_parameters[self._name]
 
 
 class ParameterMixin(ABC):

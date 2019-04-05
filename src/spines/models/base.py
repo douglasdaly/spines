@@ -11,9 +11,11 @@ import tarfile
 import zipfile
 import tempfile
 from abc import ABCMeta, abstractmethod
+from typing import Dict, List, Type
 
 from ..parameters.base import Parameter
-from ..parameters.base import ParameterStore
+from ..parameters.base import HyperParameter
+from ..parameters.store import ParameterStore
 
 
 #
@@ -25,10 +27,15 @@ class Model(object, metaclass=ABCMeta):
     Model class
     """
     _param_store_cls = ParameterStore
-    _default_param_cls = Parameter
+    _hyperparam_store_cls = ParameterStore
 
     def __init__(self, *args, **kwargs):
-        self._params = self._param_store_cls()
+        self._params = self._create_store(
+            self._param_store_cls, Parameter
+        )
+        self._hyper_params = self._create_store(
+            self._hyperparam_store_cls, HyperParameter
+        )
 
     # dunder methods
 
@@ -44,6 +51,22 @@ class Model(object, metaclass=ABCMeta):
     def parameters(self):
         """ParameterStore: Parameters which are currently set."""
         return self._params
+
+    @property
+    def hyper_parameters(self):
+        """ParameterStore: Hyper-parameters which are currently set."""
+        return self._hyper_params
+
+    # Parameter stores
+
+    @classmethod
+    def _create_store(cls, store_cls, param_cls) -> Type[ParameterStore]:
+        """Creates and instance of the parameter store"""
+        store = store_cls()
+        for attr in cls.__dict__.values():
+            if isinstance(attr, param_cls):
+                store.add(attr)
+        return store
 
     # Parameter functions
 
@@ -131,9 +154,99 @@ class Model(object, metaclass=ABCMeta):
         """
         return self._params.pop(name)
 
+    def set_hyper_params(self, **hyper_params) -> None:
+        """Sets the values of this model's hyper-parameters
+
+        Parameters
+        ----------
+        hyper_params
+            Hyper-parameter values to set.
+
+        Raises
+        ------
+        InvalidParameterException
+            If one of the given hyper-parameter values is not valid.
+
+        """
+        self._hyper_params.update(hyper_params)
+        return
+
+    def get_hyper_params(self) -> Dict[str, object]:
+        """Gets the current hyper-parameter values
+
+        Returns
+        -------
+        dict
+            Copy of the currently set hyper-parameter values.
+
+        See Also
+        --------
+        hyper_parameters, set_hyper_params
+
+        """
+        return self._hyper_params.values
+
+    def set_hyper_parameter(self, name: str, value):
+        """Sets a hyper-parameter value
+
+        Sets a hyper-parameter's value if the given `hyper_param` and `value`
+        are valid.
+
+        Parameters
+        ----------
+        name : str
+            Hyper-parameter to set value for.
+        value
+            Value to set.
+
+        Raises
+        ------
+        MissingParameterException
+            If the given `name` hyper-parameter does not exist.
+        InvalidParameterException
+            If the given `value` is not valid for the specified
+            hyper-parameter.
+
+        See Also
+        --------
+        hyper_parameters, set_hyper_params
+
+        """
+        self._hyper_parameters[name] = value
+        return
+
+    def unset_hyper_parameter(self, name: str):
+        """Un-sets a hyper-parameter
+
+        Un-sets the specified hyper-parameter's value from the set of
+        hyper-parameters and returns the previously set value.
+
+        Parameters
+        ----------
+        name : str
+            Name of the hyper-parameter to clear the value for.
+
+        Returns
+        -------
+        object
+            Previously set value of the hyper-parameter.
+
+        Raises
+        ------
+        MissingParameterException
+            If the given `name` hyper-parameter does not exist.
+
+        See Also
+        --------
+        hyper_parameters, set_hyper_params
+
+        """
+        return self._hyper_parameters.pop(name)
+
     # Save/Load methods
 
-    def save(self, path, fmt=None, overwrite_existing=False) -> str:
+    def save(self, path: str, fmt: [str, None] = None,
+             overwrite_existing: bool = False) -> str:
         """Saves this model
 
         Saves this model's `parameters`, `hyper_params` as well as
@@ -185,7 +298,7 @@ class Model(object, metaclass=ABCMeta):
                         archive.add(file, arcname=os.path.basename(file))
         return path
 
-    def _save_helper(self, dir_path):
+    def _save_helper(self, dir_path: str) -> List[str]:
         """Helper function to save object to the specified directory
 
         Parameters
@@ -202,10 +315,13 @@ class Model(object, metaclass=ABCMeta):
         ret = list()
         ret.append(self._save_object(dir_path, 'class', self.__class__))
         ret.append(self._save_object(dir_path, 'parameters', self._params))
+        ret.append(
+            self._save_object(dir_path, 'hyperparameters', self._hyper_params)
+        )
         return ret
 
     @classmethod
-    def _save_object(cls, dir_path, file, obj):
+    def _save_object(cls, dir_path: str, file: str, obj) -> str:
         """Helper function to save a single object to file
 
         Parameters
@@ -231,7 +347,8 @@ class Model(object, metaclass=ABCMeta):
         return obj_file
 
     @classmethod
-    def load(cls, path, fmt=None, new=False):
+    def load(cls, path: str, fmt: [str, None] = None, new: bool = False
+             ) -> Type['Model']:
         """Loads a saved model instance
 
         Loads saved model `parameters` and `hyper_params` as well
@@ -277,7 +394,8 @@ class Model(object, metaclass=ABCMeta):
         return instance
 
     @classmethod
-    def _load_helper(cls, dir_path, instance):
+    def _load_helper(cls, dir_path: str, instance: Type['Model']
+                     ) -> Type['Model']:
         """Helper function for loading objects from files
 
         Parameters
@@ -294,10 +412,11 @@ class Model(object, metaclass=ABCMeta):
 
         """
         instance._params = cls._load_object(dir_path, 'parameters')
+        instance._hyper_params = cls._load_object(dir_path, 'hyperparameters')
         return instance
 
     @classmethod
-    def _load_object(cls, dir_path, file):
+    def _load_object(cls, dir_path: str, file: str):
         """Helper function for loading objects from file
 
         Parameters
@@ -321,7 +440,7 @@ class Model(object, metaclass=ABCMeta):
         return ret
 
     @staticmethod
-    def _tar_mode_helper(mode, fmt):
+    def _tar_mode_helper(mode: str, fmt: str):
         """Helper function for getting tar open mode string"""
         ret = mode
         if fmt == 'lzma':
@@ -335,7 +454,7 @@ class Model(object, metaclass=ABCMeta):
         raise NotImplementedError('Format: %s' % fmt)
 
     @staticmethod
-    def _infer_file_format(path):
+    def _infer_file_format(path: str) -> str:
         """Helper function to infer the file format from the path"""
         exts = list()
         tmp_path, tmp_ext = os.path.splitext(path)
@@ -363,7 +482,7 @@ class Model(object, metaclass=ABCMeta):
         raise ValueError("Cannot infer file format, please specify")
 
     @staticmethod
-    def _get_file_extension(fmt):
+    def _get_file_extension(fmt: str) -> str:
         """Helper function to get file extension based on format"""
         if fmt == 'lzma':
             return '.tar.xz'
@@ -375,12 +494,11 @@ class Model(object, metaclass=ABCMeta):
             return '.zip'
         elif fmt == 'tar':
             return '.tar'
-        else:
-            return '.%s' % fmt
+        return '.%s' % fmt
 
     # Abstract methods
 
-    def fit(self, *args, **kwargs):
+    def fit(self, *args, **kwargs) -> None:
         """Fit the model
 
         Fits the constructed model using the parameters specified.
@@ -414,20 +532,20 @@ class Model(object, metaclass=ABCMeta):
         """
         pass
 
-    def score(self, *args, **kwargs):
-        """Scores the model for the given inputs and outputs
+    def error(self, *args, **kwargs) -> float:
+        """Returns the error measure of the model for the given data
 
         Parameters
         ----------
         args : optional
-            Additional arguments to pass to the score call.
+            Additional arguments to pass to the error call.
         kwargs : optional
-            Additional keyword-arguments to pass to the score call.
+            Additional keyword-arguments to pass to the error call.
 
         Returns
         -------
         float
-            Score for the model on the given inputs and outputs.
+            Error for the model on the given inputs and outputs.
 
         """
         pass

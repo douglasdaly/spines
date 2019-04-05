@@ -5,17 +5,17 @@ Spines
 Backbones for parameterized models.
 """
 from .models import Model
-from .models import HyperModel
-from .parameters import Parameter
-from .parameters import BoundedParameter
+from .parameters import Parameter, HyperParameter
+from .parameters import Bounded, HyperBounded
 
 __all__ = [
     # Models
     'Model',
-    'HyperModel',
     # Parameters
     'Parameter',
-    'BoundedParameter',
+    'HyperParameter',
+    'Bounded',
+    'HyperBounded',
 ]
 
 from ._version import get_versions
