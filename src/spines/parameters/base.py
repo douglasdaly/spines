@@ -5,7 +5,7 @@ Base classes for model parameters.
 #
 #   Imports
 #
-from abc import ABC, ABCMeta
+from abc import ABC
 from collections.abc import MutableMapping, Iterable
 from typing import Iterator
 
@@ -14,7 +14,7 @@ from typing import Iterator
 #   Base classes
 #
 
-class Parameter(object, metaclass=ABCMeta):
+class Parameter(object):
     """
     Parameter class
 
@@ -167,47 +167,52 @@ class ParameterStore(MutableMapping):
     """
 
     def __init__(self):
-        self._store = dict()
-        self._options = dict()
+        self._params = dict()
+        self._values = dict()
 
     # dunder methods
 
     def __setitem__(self, k: str, v: Parameter) -> None:
-        self._store[k] = self._options[k](v)
+        self._values[k] = self._params[k](v)
 
     def __delitem__(self, v: str) -> None:
-        del self._store[v]
+        del self._values[v]
 
     def __getitem__(self, k: str) -> Parameter:
-        return self._store[k]
+        return self._values[k]
 
     def __len__(self) -> int:
-        return len(self._store)
+        return len(self._values)
 
     def __iter__(self) -> Iterator[str]:
-        return iter(self._store)
+        return iter(self._values)
 
     # Properties
 
     @property
-    def parameters(self):
+    def parameters(self) -> dict:
         """dict: Copy of the current set of parameters."""
-        return self._store.copy()
+        return self._params.copy()
 
     @property
-    def options(self):
-        """dict: Parameter options object dictionary."""
-        return self._options
+    def values(self) -> dict:
+        """dict: Copy of the current set of parameter values."""
+        return self._values.copy()
 
     @property
-    def valid(self):
+    def valid(self) -> bool:
         """bool: Whether or not this is a fully valid set of parameters."""
         return self._validate_helper(raise_exceptions=False)
 
     # Helper methods
 
-    def copy(self):
+    def copy(self, deep=False):
         """Returns a copy of this parameter store object.
+
+        Parameters
+        ----------
+        deep : bool, optional
+            Whether or not to do deep-copying of this stores contents.
 
         Returns
         -------
@@ -216,48 +221,48 @@ class ParameterStore(MutableMapping):
 
         """
         new_obj = self.__class__()
-        for k, v in self._options:
+        for k, v in self._params:
             new_obj.add(v)
-        for k, v in self._store:
+        for k, v in self._values:
             new_obj[k] = v
         return new_obj
 
     def reset(self) -> None:
         """Clears all of the parameters and options stored."""
-        self._store.clear()
-        self._options.clear()
+        self._values.clear()
+        self._params.clear()
 
     # Option methods
 
-    def add(self, option) -> None:
-        """Add a :class:`ParameterOption` specification to this store
+    def add(self, parameter: Parameter) -> None:
+        """Add a :class:`Parameter` specification to this store
 
         Parameters
         ----------
         option : Parameter
-            :class:`ParameterOption` specification to add to this parameter
+            :class:`Parameter` specification to add to this parameter
             store.
 
         Raises
         ------
-        ParameterOptionExistsError
+        ParameterExistsError
             If a parameter option with the same name already exists.
 
         """
-        self._options[option.name] = option
+        self._params[parameter.name] = parameter
 
-    def remove(self, name) -> Parameter:
-        """Removes a :class:`ParameterOption` specification
+    def remove(self, name: str) -> Parameter:
+        """Removes a :class:`Parameter` specification
 
         Parameters
         ----------
         name : str
-            Name of the :class:`ParameterOption` to remove.
+            Name of the :class:`Parameter` to remove.
 
         Returns
         -------
         Parameter
-            The removed :class:`ParameterOption` specified.
+            The removed :class:`Parameter` specified.
 
         Raises
         ------
@@ -265,12 +270,14 @@ class ParameterStore(MutableMapping):
             If the given `name` does not exist.
 
         """
-        return self._options.pop(name)
+        if name in self._values.keys():
+            del self._values[name]
+        return self._params.pop(name)
 
-    def _validate_helper(self, raise_exceptions=False):
+    def _validate_helper(self, raise_exceptions=False) -> bool:
         """Helper to check if this set of parameters is valid"""
-        for k, v in self._options.items():
-            if v.required and k not in self._store.keys():
+        for k, v in self._params.items():
+            if v.required and k not in self._values.keys():
                 if raise_exceptions:
                     raise MissingParameterException(k)
                 return False

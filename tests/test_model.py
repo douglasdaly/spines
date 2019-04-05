@@ -18,14 +18,14 @@ from spines import Model
 class ModelTestImpl(Model):
     """Test model class"""
 
-    def construct(self, *args, **kwargs):
-        return True
-
     def fit(self):
         return
 
-    def transform(self):
+    def predict(self):
         return
+
+    def score(self):
+        return 0.
 
 
 def model_file_function(fmt, new):

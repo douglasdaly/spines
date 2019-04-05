@@ -7,8 +7,10 @@ Invoke commands for common tasks.
 #
 import invoke
 
+from . import install
 from . import release
+from . import uninstall
 
 
-namespace = invoke.Collection(release)
+namespace = invoke.Collection(install, release, uninstall)
 

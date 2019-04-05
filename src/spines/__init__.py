@@ -2,15 +2,17 @@
 """
 Spines
 
-Skeletons for parameterized models.
+Backbones for parameterized models.
 """
-from .base import Model
+from .models import Model
+from .models import HyperModel
 from .parameters import Parameter
 from .parameters import BoundedParameter
 
 __all__ = [
-    # Base
+    # Models
     'Model',
+    'HyperModel',
     # Parameters
     'Parameter',
     'BoundedParameter',

@@ -16,22 +16,16 @@ import re
 import invoke
 import parver
 
-from spines import __version__
+from .helpers import log as hlog
+from .helpers import print_block
 
 
 #
 #   Helpers
 #
 
-def log(msg):
-    print('[release] %s' % msg)
-
-
-def print_block(msg):
-    print('\n  ----- START -----')
-    for line in msg.split('\n'):
-        print('  %s' % line)
-    print('  -----  END  -----\n')
+def log(msg, level=None):
+    hlog(msg, name='release', level=level)
 
 
 def insert_text(original, new, after):
@@ -100,7 +94,7 @@ def changelog_rst_to_md(ctx, path):
         'pandoc %s -f rst -t markdown' % path, hide=True
     ).stdout.strip()
     content = re.sub(
-        r"([^\n]+)\n?\s+\[[\\]+(#\d+)\]\(https://github\.com/douglasdaly/[\w\-]+/issues/\d+\)",
+        r"([^\n]+)\n?\s+\[[\\]+(#\d+)\]\(https://github\.com/douglasdaly/[\w\-]+/issues/\d+\)",  # noqa
         r"\1 \2", content, flags=re.MULTILINE
     )
     return convert_rst_to_markdown(content)

@@ -12,8 +12,8 @@ import zipfile
 import tempfile
 from abc import ABCMeta, abstractmethod
 
-from .parameters.base import Parameter
-from .parameters.base import ParameterStore
+from ..parameters.base import Parameter
+from ..parameters.base import ParameterStore
 
 
 #
@@ -24,15 +24,11 @@ class Model(object, metaclass=ABCMeta):
     """
     Model class
     """
-    _parameter_store_cls = ParameterStore
-    _default_parameter_cls = Parameter
-    _default_hyper_parameter_cls = Parameter
+    _param_store_cls = ParameterStore
+    _default_param_cls = Parameter
 
-    def __init__(self):
-        self._parameters = self._parameter_store_cls()
-        self._hyper_parameters = self._parameter_store_cls()
-
-        self._results = None
+    def __init__(self, *args, **kwargs):
+        self._params = self._param_store_cls()
 
     # dunder methods
 
@@ -40,72 +36,44 @@ class Model(object, metaclass=ABCMeta):
         return self.__class__.__name__
 
     def __call__(self, *args, **kwargs):
-        return self.transform(*args, **kwargs)
+        return self.predict(*args, **kwargs)
 
     # Properties
 
     @property
     def parameters(self):
         """ParameterStore: Parameters which are currently set."""
-        return self._parameters
-
-    @property
-    def hyper_parameters(self):
-        """ParameterStore: Hyper-parameters which are currently set."""
-        return self._hyper_parameters
-
-    @property
-    def results(self):
-        """dict: Fitting result metrics."""
-        return self._results
+        return self._params
 
     # Parameter functions
 
-    def add_parameter(self, *args, **kwargs):
-        """Adds a hyper-parameter to the model
-
-        Adds a :class:`Parameter` instance (using the given `args`
-        and `kwargs` in the constructor if the first `arg` is not a
-        :class:`Parameter` instance) to this model's hyper-parameters.
+    def set_params(self, **params) -> None:
+        """Sets the values for this model's parameters
 
         Parameters
         ----------
-        args
-            Either the instantiated :class:`Parameter` class or the
-            arguments to pass to the default parameter class's constructor.
-        kwargs : optional
-            Keyword arguments to pass to the default Parameter class's
-            constructor.
-
-        """
-        if args and isinstance(args[0], Parameter):
-            self._parameters.add(args[0])
-        else:
-            self._parameters.add(
-                self._default_parameter_cls(*args, **kwargs)
-            )
-        return
-
-    def remove_parameter(self, name):
-        """Removes a parameter from the model
-
-        Parameters
-        ----------
-        name : str
-            The name of the parameter to remove.
-
-        Returns
-        -------
-        Parameter
-            The removed parameter object.
+        params
+            Parameters and values to set.
 
         Raises
         ------
-        MissingParameterException
-            If the specified `name` is not a hyper-parameter.
+        InvalidParameterException
+            If the given `name` or `value` are not valid.
 
         """
-        return self._hyper_parameters.remove(name)
+        self._params.update(params)
+        return
+
+    def get_params(self) -> dict:
+        """Gets a copy of this models parameters
+
+        Returns
+        -------
+        dict
+            Copy of currently set parameter names and values.
+
+        """
+        return self._params.values
 
     def set_parameter(self, name: str, value) -> None:
         """Sets a parameter value
@@ -127,17 +95,18 @@ class Model(object, metaclass=ABCMeta):
 
         See Also
         --------
-        parameters, remove_parameter
+        parameters
 
         """
-        self._parameters[name] = value
+        self._params[name] = value
         return
 
     def unset_parameter(self, name: str) -> object:
         """Unsets a parameter value
 
-        Removes the specified parameter's value from the parameter values
-        if it is part of the parameter set and returns its current value.
+        Removes the specified parameter's value from the parameter
+        values if it is part of the parameter set and returns its
+        current value.
 
         Parameters
         ----------
@@ -152,126 +121,22 @@ class Model(object, metaclass=ABCMeta):
         Raises
         ------
         MissingParameterException
-            If the parameter to remove does not exist in the set of parameters.
+            If the parameter to remove does not exist in the set of
+            parameters.
 
         See Also
         --------
-        parameters, add_parameter
+        parameters
 
         """
-        return self._parameters.pop(name)
-
-    # - Hyper-parameters
-
-    def add_hyper_parameter(self, *args, **kwargs):
-        """Adds a hyper-parameter to the model
-
-        Adds a :class:`Parameter` instance (using the given `args`
-        and `kwargs` in the constructor if the first `arg` is not a
-        :class:`Parameter` instance) to this model's hyper-parameters.
-
-        Parameters
-        ----------
-        args
-            Either the instantiated :class:`Parameter` class or the
-            arguments to pass to the default parameter class's constructor.
-        kwargs : optional
-            Keyword arguments to pass to the default Parameter class's
-            constructor.
-
-        """
-        if args and isinstance(args[0], Parameter):
-            self._hyper_parameters.add(args[0])
-        else:
-            self._hyper_parameters.add(
-                self._default_hyper_parameter_cls(*args, **kwargs)
-            )
-        return
-
-    def remove_hyper_parameter(self, name):
-        """Removes a hyper-parameter from the model
-
-        Parameters
-        ----------
-        name : str
-            The name of the hyper-parameter to remove.
-
-        Returns
-        -------
-        Parameter
-            The removed parameter object.
-
-        Raises
-        ------
-        MissingParameterException
-            If the specified `name` is not a hyper-parameter.
-
-        """
-        return self._hyper_parameters.remove(name)
-
-    def set_hyper_parameter(self, name, value):
-        """Sets a hyper-parameter value
-
-        Sets a hyper-parameter's value if the given `hyper_param` and `value`
-        are valid.
-
-        Parameters
-        ----------
-        name : str
-            Hyper-parameter to set value for.
-        value
-            Value to set.
-
-        Raises
-        ------
-        MissingParameterException
-            If the given `name` hyper-parameter does not exist.
-        InvalidParameterException
-            If the given `value` is not valid for the specified
-            hyper-parameter.
-
-        See Also
-        --------
-        hyper_parameters, remove_hyper_parameter
-
-        """
-        self._hyper_parameters[name] = value
-        return
-
-    def unset_hyper_parameter(self, name):
-        """Un-sets a hyper-parameter
-
-        Un-sets the specified hyper-parameter's value from the set of
-        hyper-parameters and returns the previously set value.
-
-        Parameters
-        ----------
-        name : str
-            Name of the hyper-parameter to clear the value for.
-
-        Returns
-        -------
-        object
-            Previously set value of the hyper-parameter.
-
-        Raises
-        ------
-        MissingParameterException
-            If the given `name` hyper-parameter does not exist.
-
-        See Also
-        --------
-        hyper_parameters, add_hyper_parameter
-
-        """
-        return self._hyper_parameters.pop(name)
+        return self._params.pop(name)
 
     # Save/Load methods
 
-    def save(self, path, fmt=None, overwrite_existing=False):
+    def save(self, path, fmt=None, overwrite_existing=False) -> str:
         """Saves this model
 
-        Saves this model's `parameters`, `hyper_parameters` as well as
+        Saves this model's `parameters`, `hyper_params` as well as
         any other data required to reconstruct this model.  Saves this
         data with the given unique `tag` name.
 
@@ -336,9 +201,7 @@ class Model(object, metaclass=ABCMeta):
         """
         ret = list()
         ret.append(self._save_object(dir_path, 'class', self.__class__))
-        ret.append(self._save_object(dir_path, 'parameters', self._parameters))
-        ret.append(self._save_object(dir_path, 'hyper_parameters',
-                                     self._hyper_parameters))
+        ret.append(self._save_object(dir_path, 'parameters', self._params))
         return ret
 
     @classmethod
@@ -371,7 +234,7 @@ class Model(object, metaclass=ABCMeta):
     def load(cls, path, fmt=None, new=False):
         """Loads a saved model instance
 
-        Loads saved model `parameters` and `hyper_parameters` as well
+        Loads saved model `parameters` and `hyper_params` as well
         as any serialized model-specific objects from a saved version
         with the `tag` specified (from the base `project_dir`).
 
@@ -430,10 +293,7 @@ class Model(object, metaclass=ABCMeta):
             The model loaded from file.
 
         """
-        instance._parameters = cls._load_object(dir_path, 'parameters')
-        instance._hyper_parameters = cls._load_object(
-            dir_path, 'hyper_parameters'
-        )
+        instance._params = cls._load_object(dir_path, 'parameters')
         return instance
 
     @classmethod
@@ -520,26 +380,10 @@ class Model(object, metaclass=ABCMeta):
 
     # Abstract methods
 
-    def build(self, *args, **kwargs):
-        """Builds the model for use
-
-        Initializes the model for use in fitting and/or transformations.
-
-        Parameters
-        ----------
-        args : optional
-            Any additional arguments to use in the build call.
-        kwargs : optional
-            Any additional keyword arguments to use in the build call.
-
-        """
-        return
-
     def fit(self, *args, **kwargs):
-        """Fits the model
+        """Fit the model
 
-        Fits the constructed model using the parameters and hyper-parameters
-        specified.
+        Fits the constructed model using the parameters specified.
 
         Parameters
         ----------
@@ -552,23 +396,38 @@ class Model(object, metaclass=ABCMeta):
         return
 
     @abstractmethod
-    def transform(self, *args, **kwargs):
-        """Transform inputs into outputs
-
-        For the given input(s), use the model to generate outputs.  This is
-        also known as "predict"
+    def predict(self, *args, **kwargs):
+        """Predict outputs for the given inputs
 
         Parameters
         ----------
         args : optional
-            Additional parameter to pass to transform call.
+            Additional arguments to pass to predict call.
         kwargs : optional
-            Additional keyword arguments to pass to transform call.
+            Additional keyword arguments to pass to predict call.
 
         Returns
         -------
         object
-            Transformations from the given data.
+            Predictions from the given data.
+
+        """
+        pass
+
+    def score(self, *args, **kwargs):
+        """Scores the model for the given inputs and outputs
+
+        Parameters
+        ----------
+        args : optional
+            Additional arguments to pass to the score call.
+        kwargs : optional
+            Additional keyword-arguments to pass to the score call.
+
+        Returns
+        -------
+        float
+            Score for the model on the given inputs and outputs.
 
         """
         pass

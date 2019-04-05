@@ -18,22 +18,36 @@ GARBAGE_PATTERNS := *.pyc *~ *-checkpoint.ipynb
 GARBAGE := $(foreach DIR,$(DIRS),$(addprefix $(DIR)/,$(GARBAGE_PATTERNS)))
 
 FLAKE8 = flake8
+INVOKE = invoke
 TOX = tox
 TWINE = twine
 UNIT_TEST = pytest
 
 ifeq ($(PKG_MGR), pipenv)
     RUN_PRE = pipenv run
+	VENV_DIR := $(pipenv --venv)
+
+	CREATE_VENV =
+	REMOVE_VENV = pipenv --rm
     INSTALL_DEPENDENCIES = pipenv install --dev
     GENERATE_DEPENDENCIES = pipenv lock --dev -r > requirements.txt
 else
     RUN_PRE =
+	VENV_DIR = env
+
+	CREATE_VENV := virtualenv $(VENV_DIR)/
+	REMOVE_VENV := rm -rf $(VENV_DIR)
     INSTALL_DEPENDENCIES = pip install -r requirements.txt
     GENERATE_DEPENDENCIES = pip freeze --local > requirements.txt
 endif
 
+ACTIVATE_VENV := source $(VENV_DIR)/bin/activate
+DEACTIVATE_VENV = deactivate
+
 PYTHON := $(RUN_PRE) $(PYTHON)
+
 FLAKE8 := $(RUN_PRE) $(FLAKE8)
+INVOKE := $(RUN_PRE) $(INVOKE)
 TOX := $(RUN_PRE) $(TOX)
 TWINE := $(RUN_PRE) $(TWINE)
 UNIT_TEST := $(RUN_PRE) $(UNIT_TEST)
@@ -41,11 +55,13 @@ UNIT_TEST := $(RUN_PRE) $(UNIT_TEST)
 ###############################################################################
 # COMMANDS                                                                    #
 ###############################################################################
-.PHONY: help \
+.PHONY: help setup teardown \
+		venv-create venv-remove \
         requirements requirements-generate \
         docs docs-clean \
         clean clean-build \
 		changelog changelog-draft \
+		ipykernel-install ipykernel-uninstall \
 		lint coverage \
 		test test-tox \
 		build check-build release
@@ -58,6 +74,18 @@ help: ## Displays this help message
 	@echo 'Available targets:'
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-30s\033[0m %s\n", $$1, $$2}'
 	@echo ''
+
+setup: venv-create requirements ipykernel-install ## Sets up the environment for development
+
+teardown: ipykernel-uninstall venv-remove ## Removes the environment for development
+
+# Virtual environment
+
+venv-create: ## Creates the virtual environment for this project
+	$(CREATE_VENV)
+
+venv-remove: ## Removes the virtual environment for this project
+	$(REMOVE_VENV)
 
 # Requirements
 
@@ -90,10 +118,18 @@ clean-build: ## Clean out the compiled package files
 # Changes
 
 changelog: ## Generates the new CHANGELOG.md file
-	$(PYTHON) invoke release.changelog
+	$(INVOKE) release.changelog
 
 changelog-draft: ## Generates the draft new CHANGELOG.draft.md file
-	$(PYTHON) invoke release.changelog --draft
+	$(INVOKE) release.changelog --draft
+
+# IPyKernel
+
+ipykernel-install:  ## Installs the IPyKernel for this environment
+	$(INVOKE) install.ipykernel
+
+ipykernel-uninstall: ## Uninstalls the IPyKernel for this environment
+	$(INVOKE) uninstall.ipykernel
 
 # Code
 
@@ -117,7 +153,7 @@ build: clean-build ## Builds the library package
 	$(PYTHON) setup.py sdist
 	$(PYTHON) setup.py bdist_wheel
 
-check-build: ## Check the ubilt packages prior to uploading
+check-build: ## Check the built packages prior to uploading
 	$(TWINE) check dist/*
 
 upload: ## Uploads the package to the PyPI server
