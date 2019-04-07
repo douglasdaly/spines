@@ -13,6 +13,7 @@ import tempfile
 from abc import ABCMeta, abstractmethod
 from typing import Dict, List, Type
 
+from . import decorators
 from ..parameters.base import Parameter
 from ..parameters.base import HyperParameter
 from ..parameters.store import ParameterStore
@@ -37,6 +38,9 @@ class Model(object, metaclass=ABCMeta):
             self._hyperparam_store_cls, HyperParameter
         )
 
+        self.fit = decorators.finalize_pre(self._hyper_params, self.fit)
+        self.fit = decorators.finalize_post(self._params, self.fit)
+
     # dunder methods
 
     def __str__(self):
@@ -56,6 +60,71 @@ class Model(object, metaclass=ABCMeta):
     def hyper_parameters(self):
         """ParameterStore: Hyper-parameters which are currently set."""
         return self._hyper_params
+
+    # Core methods
+
+    def build(self, *args, **kwargs) -> None:
+        """Builds the model
+
+        Parameters
+        ----------
+        args : optional
+            Arguments to use in building the model.
+        kwargs : optional
+            Keyword arguments to use in building the model.
+
+        """
+        return
+
+    def fit(self, *args, **kwargs) -> None:
+        """Fits the model
+
+        Parameters
+        ----------
+        args : optional
+            Arguments to use in fit call.
+        kwargs : optional
+            Any additional keyword arguments to use in fit call.
+
+        """
+        return
+
+    @abstractmethod
+    def predict(self, *args, **kwargs):
+        """Predict outputs for the given inputs
+
+        Parameters
+        ----------
+        args : optional
+            Additional arguments to pass to predict call.
+        kwargs : optional
+            Additional keyword arguments to pass to predict call.
+
+        Returns
+        -------
+        object
+            Predictions from the given data.
+
+        """
+        pass
+
+    def error(self, *args, **kwargs) -> float:
+        """Returns the error measure of the model for the given data
+
+        Parameters
+        ----------
+        args : optional
+            Additional arguments to pass to the error call.
+        kwargs : optional
+            Additional keyword-arguments to pass to the error call.
+
+        Returns
+        -------
+        float
+            Error for the model on the given inputs and outputs.
+
+        """
+        pass
 
     # Parameter stores
 
@@ -186,11 +255,11 @@ class Model(object, metaclass=ABCMeta):
         """
         return self._hyper_params.values
 
-    def set_hyper_parameter(self, name: str, value):
+    def set_hyper_parameter(self, name: str, value) -> None:
         """Sets a hyper-parameter value
 
-        Sets a hyper-parameter's value if the given `hyper_param` and `value`
-        are valid.
+        Sets a hyper-parameter's value if the given `hyper_param` and
+        `value` are valid.
 
         Parameters
         ----------
@@ -495,60 +564,6 @@ class Model(object, metaclass=ABCMeta):
         elif fmt == 'tar':
             return '.tar'
         return '.%s' % fmt
-
-    # Abstract methods
-
-    def fit(self, *args, **kwargs) -> None:
-        """Fit the model
-
-        Fits the constructed model using the parameters specified.
-
-        Parameters
-        ----------
-        args : optional
-            Arguments to use in fit call.
-        kwargs : optional
-            Any additional keyword arguments to use in fit call.
-
-        """
-        return
-
-    @abstractmethod
-    def predict(self, *args, **kwargs):
-        """Predict outputs for the given inputs
-
-        Parameters
-        ----------
-        args : optional
-            Additional arguments to pass to predict call.
-        kwargs : optional
-            Additional keyword arguments to pass to predict call.
-
-        Returns
-        -------
-        object
-            Predictions from the given data.
-
-        """
-        pass
-
-    def error(self, *args, **kwargs) -> float:
-        """Returns the error measure of the model for the given data
-
-        Parameters
-        ----------
-        args : optional
-            Additional arguments to pass to the error call.
-        kwargs : optional
-            Additional keyword-arguments to pass to the error call.
-
-        Returns
-        -------
-        float
-            Error for the model on the given inputs and outputs.
-
-        """
-        pass
 
 
 #

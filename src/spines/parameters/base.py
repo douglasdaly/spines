@@ -6,7 +6,6 @@ Base classes for model parameters.
 #   Imports
 #
 from abc import ABC
-from collections.abc import Iterable
 from typing import Type
 
 
@@ -18,33 +17,34 @@ class Parameter(object):
     """
     Parameter class
 
-    Attributes
-    ----------
-    name : str
-        Name of the Parameter.
-    value_type : :obj:`Iterable` of :obj:`type`
-        The type(s) of values allowed for this parameter.
-    required : bool
-        Whether or not this is a required parameter.
-    default : object
-        Default value for this parameter.
-
     Parameters
     ----------
     value_type : :obj:`type` or :obj:`Iterable` of :obj:`type`
         The type(s) of values allowed for this parameter.
-    required : bool, optional
-        Whether or not this is a required parameter (default is True).
     default : object, optional
-        Default value for this parameter (default is None).
+        Default value for this parameter, if any.
+    desc : str, optional
+        Description for this parameter, if any.
 
     """
 
-    def __init__(self, value_type, required=True, default=None):
+    def __init__(self, *value_type, default=None, desc: str = None):
         self._name = None
-        self.value_type = value_type
-        self.required = required
-        self.default = default
+        self._desc = desc
+
+        if not all([isinstance(x, type) for x in value_type]):
+            raise TypeError('Must use types when setting this value')
+        self._value_types = value_type
+
+        if default is None:
+            self._required = True
+        else:
+            if not isinstance(default, self.value_type):
+                raise TypeError(
+                    'Value type must be one of: %s' % self.value_type
+                )
+            self._required = False
+        self._default = default
 
     # dunder Methods
 
@@ -81,58 +81,30 @@ class Parameter(object):
 
     @property
     def name(self) -> str:
-        """str: Name of this parameter"""
+        """str: Name of this parameter."""
         return self._name
+
+    @property
+    def desc(self) -> str:
+        """str: Description of this parameter."""
+        return self._desc
 
     @property
     def value_type(self) -> tuple:
         """tuple: The types of values allowed for this option."""
         return self._value_types
 
-    @value_type.setter
-    def value_type(self, value):
-        """Sets the value type(s) allowed
-
-        Parameters
-        ----------
-        value : :obj:`type` or :obj:`Iterable` of :obj:`type`
-            Value type(s) allowed for this option.
-
-        """
-        if not isinstance(value, Iterable):
-            value = (value,)
-        else:
-            value = tuple(value)
-        if not all([isinstance(x, type) for x in value]):
-            raise TypeError('Must use types when setting this value')
-        self._value_types = value
-
     @property
     def default(self):
         """object: Default value to use for this parameter."""
         return self._default
 
-    @default.setter
-    def default(self, value):
-        """Sets the default value for this parameter
+    @property
+    def required(self) -> bool:
+        """bool: Whether or not this parameter is required to be set."""
+        return self._required
 
-        Parameters
-        ----------
-        value
-            Default value to use for this parameter.
-
-        Raises
-        ------
-        InvalidParameterException
-            If the type of the given `value` is not a valid parameter
-            `value_type`.
-
-        """
-        if value is not None and not isinstance(value, self.value_type):
-            raise TypeError('Value type must be one of: %s' % self.value_type)
-        self._default = value
-
-    # Check methods
+    # Methods
 
     def check(self, value) -> bool:
         """Checks the given `value` for validity
@@ -194,7 +166,7 @@ class ParameterMixin(ABC):
     Base mixin class for parameters
     """
 
-    def _check_helper(self, value, raise_exceptions=True):
+    def _check_helper(self, value, raise_exceptions: bool = True) -> bool:
         """Helper function to check if the given value is valid."""
         return super(ParameterMixin, self)._check_helper(
             value, raise_exceptions=raise_exceptions

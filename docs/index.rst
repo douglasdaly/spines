@@ -7,22 +7,20 @@ Spines
 About
 =====
 
-Spines was built to provide a skeleton for Model classes: a common 
-interface for users to build models around (with some tools and 
-utilities which take advantage of having the commonalities).  It's 
-similar, in structure, to some of scikit-learn's underlying Estimator 
-classes - but with a single set of unified functions for all models, 
+Spines was built to provide a skeleton for Model classes: a common
+interface for users to build models around (with some tools and
+utilities which take advantage of having the commonalities).  It's
+similar, in structure, to some of scikit-learn's underlying Estimator
+classes - but with a single set of unified functions for all models,
 namely:
 
 - Build
 - Fit
-- Transform
+- Predict
+- Error
 
-The transform method is the only one that's required, though the other 
-two are likely useful most of the time.  Spines is **absolutely not** a 
-replacement for scikit-learn (or any other data/machine-learning 
-library) it's simply a useful framework for building your own models 
-(leveraging *any* library) in a standardized and convenient way.
+The predict method is the only one that's required, though the others
+are likely useful most of the time.
 
 
 Installing
@@ -33,6 +31,65 @@ Install with your favorite package manager, like ``pipenv``:
 .. code-block:: bash
 
     $ pipenv install spines
+
+
+Simple Example
+==============
+
+To demonstrate how to build a model with spines we'll use a toy example
+of a simple linear regression model.  First we import what we'll need:
+
+.. code-block:: python
+
+    import numpy as np
+
+    from spines import Model, Parameter
+
+
+Now we'll create the model class:
+
+.. code-block:: python
+
+    class LinearRegression(Model):
+        """
+        Simple linear regression model
+
+            y = mx + b
+
+        """
+        m = Parameter(float)
+        b = Parameter(float)
+
+        def fit(self, x, y):
+            covs = np.cov(x, y)
+            self.m = (covs[0, 1] / np.var(x))
+            self.b = np.mean(y) - (self.m * np.mean(x))
+
+        def predict(self, x):
+            return (self.m * x) + self.b
+
+Now that we have the model we can generate some random data to fit it
+with:
+
+.. code-block:: python
+
+    x = np.random.rand(10)
+    y = 3.0 * x
+    x += np.random.normal(scale=0.05, size=(10,))
+
+Then create and fit the model:
+
+.. code-block:: python
+
+    model = LinearRegression()
+    model.fit(x, y)
+
+If we look at the ``model.parameters`` attribute we should see something
+like ``b`` being a small-ish number around 0 and ``m`` being close to
+3.
+
+See the :doc:`quick start <quickstart>` page for a slightly more
+in-depth example.
 
 
 .. toctree::

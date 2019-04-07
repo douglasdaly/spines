@@ -6,9 +6,37 @@ Parameter storage module.
 #   Imports
 #
 from collections.abc import MutableMapping
-from typing import Iterator
+from functools import wraps
+from typing import Dict, Iterator, Type
 
 from .base import Parameter
+from .base import MissingParameterException
+
+
+#
+#   Decorators
+#
+
+def state_changed(func):
+    """Decorator indicating a function which changes the state
+
+    Parameters
+    ----------
+    func : callable
+        The function to wrap.
+
+    Returns
+    -------
+    callable
+        The wrapped function.
+
+    """
+    @wraps(func)
+    def wrapped(self, *args, **kwargs):
+        ret = func(self, *args, **kwargs)
+        self._finalized = False
+        return ret
+    return wrapped
 
 
 #
@@ -24,13 +52,33 @@ class ParameterStore(MutableMapping):
         self._params = dict()
         self._values = dict()
 
+        self._finalized = True
+
     # dunder methods
 
+    def __repr__(self):
+        ret = "<%s final=%s> {\n" % (self.__class__.__name__, self._finalized)
+        for k, v in self._params.items():
+            ret += "  %s: %s,\n" % (repr(v), self._values.get(k))
+        ret += "}"
+        return ret
+
+    def __str__(self):
+        ret = "{\n"
+        for k, v in self._params.items():
+            ret += "  %s: %s\n" % (v, self._values.get(k))
+        ret += "}"
+        return ret
+
+    # Mapping functions
+
+    @state_changed
     def __setitem__(self, k: str, v) -> None:
         if self._params[k](v):
             self._values[k] = v
         return
 
+    @state_changed
     def __delitem__(self, v: str) -> None:
         del self._values[v]
 
@@ -46,12 +94,12 @@ class ParameterStore(MutableMapping):
     # Properties
 
     @property
-    def parameters(self) -> dict:
+    def parameters(self) -> Dict[str, Parameter]:
         """dict: Copy of the current set of parameters."""
         return self._params.copy()
 
     @property
-    def values(self) -> dict:
+    def values(self) -> Dict[str, object]:
         """dict: Copy of the current set of parameter values."""
         return self._values.copy()
 
@@ -60,9 +108,14 @@ class ParameterStore(MutableMapping):
         """bool: Whether or not this is a fully valid set of parameters."""
         return self._validate_helper(raise_exceptions=False)
 
+    @property
+    def final(self) -> bool:
+        """bool: Whethor or not this set of parameters is finalized."""
+        return self._finalized
+
     # Helper methods
 
-    def copy(self, deep=False):
+    def copy(self, deep: bool = False) -> Type['ParameterStore']:
         """Returns a copy of this parameter store object.
 
         Parameters
@@ -81,8 +134,11 @@ class ParameterStore(MutableMapping):
             new_obj.add(v)
         for k, v in self._values:
             new_obj[k] = v
+        if self._finalized:
+            new_obj.finalize()
         return new_obj
 
+    @state_changed
     def reset(self) -> None:
         """Clears all of the parameters and options stored."""
         self._values.clear()
@@ -90,7 +146,8 @@ class ParameterStore(MutableMapping):
 
     # Option methods
 
-    def add(self, parameter: Parameter) -> None:
+    @state_changed
+    def add(self, parameter: Type[Parameter]) -> None:
         """Add a :class:`Parameter` specification to this store
 
         Parameters
@@ -108,6 +165,7 @@ class ParameterStore(MutableMapping):
         self._params[parameter.name] = parameter
         return
 
+    @state_changed
     def remove(self, name: str) -> Parameter:
         """Removes a :class:`Parameter` specification
 
@@ -131,7 +189,23 @@ class ParameterStore(MutableMapping):
             del self._values[name]
         return self._params.pop(name)
 
-    def _validate_helper(self, raise_exceptions=False) -> bool:
+    def finalize(self) -> bool:
+        """Finalizes the parameters stored
+
+        Raises
+        ------
+        MissingParameterException
+            If a required parameter is not set.
+
+        """
+        if self._validate_helper(raise_exceptions=True):
+            for k, v in self._params.items():
+                if k not in self._values.keys():
+                    self._values[k] = v.default
+            self._finalized = True
+        return
+
+    def _validate_helper(self, raise_exceptions: bool = False) -> bool:
         """Helper to check if this set of parameters is valid"""
         for k, v in self._params.items():
             if v.required and k not in self._values.keys():
