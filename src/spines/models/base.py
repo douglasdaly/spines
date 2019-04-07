@@ -39,7 +39,6 @@ class Model(object, metaclass=ABCMeta):
         )
 
         self.fit = decorators.finalize_pre(self._hyper_params, self.fit)
-        self.fit = decorators.finalize_post(self._params, self.fit)
 
     # dunder methods
 

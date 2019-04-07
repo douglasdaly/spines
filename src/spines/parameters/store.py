@@ -74,8 +74,7 @@ class ParameterStore(MutableMapping):
 
     @state_changed
     def __setitem__(self, k: str, v) -> None:
-        if self._params[k](v):
-            self._values[k] = v
+        self._values[k] = self._params[k](v)
         return
 
     @state_changed
@@ -189,7 +188,7 @@ class ParameterStore(MutableMapping):
             del self._values[name]
         return self._params.pop(name)
 
-    def finalize(self) -> bool:
+    def finalize(self) -> None:
         """Finalizes the parameters stored
 
         Raises

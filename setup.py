@@ -42,6 +42,9 @@ setup(
 
     version=versioneer.get_version(),
     cmdclass=versioneer.get_cmdclass(),
+    install_requires=[
+        'parver',
+    ],
     tests_require=[
         'pytest',
         'pytest-cov',

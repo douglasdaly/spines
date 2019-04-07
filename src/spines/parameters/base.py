@@ -50,8 +50,8 @@ class Parameter(object):
 
     def __call__(self, value):
         if self._check_helper(value, raise_exceptions=True):
-            return True
-        return False
+            return value
+        return
 
     def __repr__(self) -> str:
         return '<%s %s [type=%s] (%s)>' % (
