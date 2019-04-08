@@ -73,3 +73,40 @@ class Version(object):
         slug_vers = slugify(str(self._version))
         return '%s/%s' % (slug_name, slug_vers)
 
+    # Version actions
+
+    def to_release(self) -> None:
+        """Switches the version to release"""
+        self._version = self._version.clear(dev=False, pre=False, post=False)
+        return
+
+    def to_pre(self) -> None:
+        """Switches the version to pre-release"""
+        self._version = self._version.clear(pre=True)
+        return
+
+    def to_post(self) -> None:
+        """Switches the version to post-release"""
+        self._version = self._version.clear(post=True)
+        return
+
+    def to_dev(self) -> None:
+        """Switches the version to development"""
+        self._version = self._version.clear(dev=True)
+        return
+
+    def bump(self) -> None:
+        """Bumps this version's PATCH number by one."""
+        self._version = self._version.bump_release(index=2)
+        return
+
+    def bump_minor(self) -> None:
+        """Bumps this version's MINOR number by one."""
+        self._version = self._version.bump_release(index=1)
+        return
+
+    def bump_major(self) -> None:
+        """Bumps this version's MAJOR number by one."""
+        self._version = self._version.bump_release(index=0)
+        return
+

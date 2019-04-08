@@ -54,12 +54,17 @@ class Parameter(object):
         return
 
     def __repr__(self) -> str:
-        return '<%s %s [type=%s] (%s)>' % (
-            self.__class__.__name__,
-            self.name,
-            ', '.join([x.__name__ for x in self.value_type]),
-            ', '.join(self._disp_props())
+        ret = '<%s %s [type=%s]' % (
+                self.__class__.__name__,
+                self.name,
+                ', '.join([x.__name__ for x in self.value_type])
         )
+        disp_props = self._disp_props()
+        if disp_props:
+            ret += " (%s)>" % ', '.join(self._disp_props())
+        else:
+            ret += ">"
+        return ret
 
     def __str__(self) -> str:
         return self._name
