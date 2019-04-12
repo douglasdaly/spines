@@ -30,8 +30,8 @@ def slugify(value: str, allow_unicode: bool = False) -> str:
     Convert to lowercase. Also strip leading and trailing whitespace.
 
     .. note::
-
-        From Django: https://github.com/django/django/blob/master/django/utils/text.py
+        Modified (barely) from Django:
+        https://github.com/django/django/blob/master/django/utils/text.py
 
     Parameters
     ----------
@@ -52,7 +52,7 @@ def slugify(value: str, allow_unicode: bool = False) -> str:
     else:
         value = unicodedata.normalize('NFKD', value).encode('ascii', 'ignore')\
                            .decode('ascii')
-    value = re.sub(r'[^\w\s-]', '', value).strip().lower()
+    value = re.sub(r'[^\w\s-]', '_', value).strip().lower()
     return re.sub(r'[-\s]+', '-', value)
 
 
@@ -89,34 +89,6 @@ def get_doc_string(obj):
 
     """
     return inspect.cleandoc(inspect.getdoc(obj))
-
-
-def get_byte_code(source):
-    """Compiles the given source to byte-code
-
-    Parameters
-    ----------
-    source : str
-        Source code to compile.
-
-    Returns
-    -------
-    bytes
-        Byte code from compiled source.
-
-    """
-    tmp_file = tempfile.mktemp(prefix='spines-', suffix='.py')
-    with open(tmp_file, 'w') as fout:
-        fout.write(source)
-
-    byte_file = py_compile.compile(tmp_file, cfile=tmp_file + 'c')
-    with open(byte_file, 'rb') as fin:
-        byte_code = fin.read()
-
-    os.remove(tmp_file)
-    os.remove(byte_file)
-
-    return byte_code
 
 
 def get_diff(a: [str, List[str]], b: [str, List[str]], n=3):
