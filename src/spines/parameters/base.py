@@ -201,4 +201,3 @@ class InvalidParameterException(ParameterException):
     Thrown when an invalid parameter is given.
     """
     pass
-
