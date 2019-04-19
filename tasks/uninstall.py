@@ -7,16 +7,15 @@ Uninstall tasks
 #
 import invoke
 
+from .helpers import log as hlog
+
 
 #
 #   Helpers
 #
 
 def log(msg, level=None):
-    prt_msg = '[uninstall] '
-    if level:
-        prt_msg += '(%s) ' % (prt_msg, level)
-    print(prt_msg + msg)
+    hlog(msg, name='uninstall', level=level)
 
 
 #
@@ -31,4 +30,3 @@ def ipykernel(ctx, name=None):
 
     log("Removing IPyKernel: %s" % name)
     ctx.run("jupyter kernelspec remove -f %s" % name)
-

@@ -11,4 +11,6 @@ install:
   - pipenv install --dev
 script:
   - make test
-
+  - make coverage
+after_success:
+  - coveralls
