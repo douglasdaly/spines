@@ -14,6 +14,7 @@ from abc import ABCMeta, abstractmethod
 from typing import Dict, List, Type
 
 from . import decorators
+from . import utils
 from ..parameters.base import Parameter
 from ..parameters.base import HyperParameter
 from ..parameters.store import ParameterStore
@@ -27,19 +28,30 @@ class Model(object, metaclass=ABCMeta):
     """
     Model class
     """
-    _param_store_cls = ParameterStore
-    _hyperparam_store_cls = ParameterStore
+    __param_store__ = ParameterStore
+    __hyperparam_store__ = ParameterStore
 
     def __init__(self, *args, **kwargs):
         self._params = self._create_store(
-            self._param_store_cls, Parameter
+            self.__param_store__, Parameter
         )
         self._hyper_params = self._create_store(
-            self._hyperparam_store_cls, HyperParameter
+            self.__hyperparam_store__, HyperParameter
         )
 
-        self.fit = decorators.finalize_pre(self._hyper_params, self.fit)
-        self.fit = decorators.finalize_post(self._params, self.fit)
+        self.fit = decorators.finalize_pre(self.fit, self._hyper_params)
+        self.fit = decorators.finalize_post(self.fit, self._params)
+
+        overridden_methods = utils.get_overridden_methods(Model, self)
+        for method in overridden_methods:
+            setattr(self, method, decorators.override(getattr(self, method)))
+
+        if (hasattr(self.error, '__is_overridden')
+                and not hasattr(self.score, '__is_overridden')):
+            self.score = decorators.inverse_from_func(self.score, self.error)
+        elif (hasattr(self.score, '__is_overridden')
+                and not hasattr(self.error, '__is_overridden')):
+            self.error = decorators.inverse_from_func(self.error, self.score)
 
     # dunder methods
 
@@ -108,6 +120,25 @@ class Model(object, metaclass=ABCMeta):
         """
         pass
 
+    def score(self, *args, **kwargs) -> float:
+        """Returns the score measure of the model for the given data
+
+        Parameters
+        ----------
+        args : optional
+            Arguments (data inputs and outputs) to pass to the score
+            call.
+        kwargs : optional
+            Additional keyword-arguements to pass to the score call.
+
+        Returns
+        -------
+        float
+            Score for the model on the given inputs and outputs.
+
+        """
+        return
+
     def error(self, *args, **kwargs) -> float:
         """Returns the error measure of the model for the given data
 
@@ -124,7 +155,7 @@ class Model(object, metaclass=ABCMeta):
             Error for the model on the given inputs and outputs.
 
         """
-        pass
+        return
 
     # Parameter stores
 

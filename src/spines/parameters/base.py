@@ -49,7 +49,13 @@ class Parameter(object):
     # dunder Methods
 
     def __call__(self, value):
-        if self._check_helper(value, raise_exceptions=True):
+        try:
+            if self._check_helper(value, raise_exceptions=True):
+                return value
+        except InvalidParameterException:
+            value = self.preprocess(value)
+            if not self._check_helper(value, raise_exceptions=False):
+                raise
             return value
         return
 
@@ -114,6 +120,9 @@ class Parameter(object):
     def check(self, value) -> bool:
         """Checks the given `value` for validity
 
+        Based on this particular Parameter's settings this method checks
+        the given value to see if it's in-line with the specifications.
+
         Parameters
         ----------
         value
@@ -123,6 +132,10 @@ class Parameter(object):
         -------
         bool
             Whether or not the value is valid for the parameter.
+
+        See Also
+        --------
+        preprocess
 
         """
         return self._check_helper(value, raise_exceptions=False)
@@ -151,6 +164,53 @@ class Parameter(object):
         if self.default:
             ret.append('default=%s' % self.default)
         return ret
+
+    def preprocess(self, value):
+        """Pre-process/massage parameter values into correct type
+
+        This is used to try and convert parameter values to the allowed
+        types (if possible).  For instance the allowed type may be a
+        :obj:`float` but the user provides ``1``, we would likely not
+        want to break in that situation, but simply convert the
+        :obj:`int` given into a :obj:`float`.  However, this can also be
+        used to perform more complex initialization or customization on
+        given parameter values, if needed.
+
+        The default method is to try and cast the given value as the
+        types given in this Parameter's ``_value_types`` attribute and
+        returning the first successful cast, otherwise returns the given
+        input `value`.
+
+        This method can be easily extended or overridden for custom
+        Parameter classes to handle more complex value types.
+
+        Parameters
+        ----------
+        value : object
+            The value to pre-process for this parameter.
+
+        Returns
+        -------
+        object
+            The pre-processed value.
+
+        Note
+        ----
+        This method is, by default, only called if the given value fails
+        this Parameter's ``check`` call.
+
+        See Also
+        --------
+        check
+
+        """
+        for val_type in self._value_types:
+            try:
+                value = val_type(value)
+                break
+            except ValueError:
+                pass
+        return value
 
 
 class HyperParameter(Parameter):
