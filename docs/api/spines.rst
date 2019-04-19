@@ -10,11 +10,6 @@ spines
 .. toctree::
     :caption: Subpackages
 
+    spines.models
     spines.parameters
-
-
-.. toctree::
-    :caption: Submodules
-
-    spines.base
-
+    spines.versioning

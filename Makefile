@@ -12,37 +12,59 @@ PKG_MGR = pipenv
 # SETUP                                                                       #
 ###############################################################################
 
-SUBDIR_ROOTS := docs spines tests
+SUBDIR_ROOTS := docs src tests
 DIRS := . $(shell find $(SUBDIR_ROOTS) -type d)
 GARBAGE_PATTERNS := *.pyc *~ *-checkpoint.ipynb
 GARBAGE := $(foreach DIR,$(DIRS),$(addprefix $(DIR)/,$(GARBAGE_PATTERNS)))
 
 FLAKE8 = flake8
-UNIT_TEST = pytest
+INVOKE = invoke
+TOX = tox
 TWINE = twine
+UNIT_TEST = pytest
 
 ifeq ($(PKG_MGR), pipenv)
     RUN_PRE = pipenv run
-    INSTALL_DEPENDENCIES = pipenv install
-    GENERATE_DEPENDENCIES = pipenv lock -r > requirements.txt
+	VENV_DIR := $(pipenv --venv)
+
+	CREATE_VENV =
+	REMOVE_VENV = pipenv --rm
+    INSTALL_DEPENDENCIES = pipenv install --dev
+    GENERATE_DEPENDENCIES = pipenv lock --dev -r > requirements.txt
 else
     RUN_PRE =
+	VENV_DIR = env
+
+	CREATE_VENV := virtualenv $(VENV_DIR)/
+	REMOVE_VENV := rm -rf $(VENV_DIR)
     INSTALL_DEPENDENCIES = pip install -r requirements.txt
     GENERATE_DEPENDENCIES = pip freeze --local > requirements.txt
 endif
 
+ACTIVATE_VENV := source $(VENV_DIR)/bin/activate
+DEACTIVATE_VENV = deactivate
+
 PYTHON := $(RUN_PRE) $(PYTHON)
+
 FLAKE8 := $(RUN_PRE) $(FLAKE8)
-UNIT_TEST := $(RUN_PRE) $(UNIT_TEST)
+INVOKE := $(RUN_PRE) $(INVOKE)
+TOX := $(RUN_PRE) $(TOX)
 TWINE := $(RUN_PRE) $(TWINE)
+UNIT_TEST := $(RUN_PRE) $(UNIT_TEST)
 
 ###############################################################################
 # COMMANDS                                                                    #
 ###############################################################################
-.PHONY: help \
+.PHONY: help setup teardown \
+		venv-create venv-remove \
         requirements requirements-generate \
         docs docs-clean \
-        clean lint test
+        clean clean-build \
+		changelog changelog-draft \
+		ipykernel-install ipykernel-uninstall \
+		lint coverage \
+		test test-tox \
+		build check-build release
 
 .DEFAULT-GOAL := help
 
@@ -52,6 +74,18 @@ help: ## Displays this help message
 	@echo 'Available targets:'
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-30s\033[0m %s\n", $$1, $$2}'
 	@echo ''
+
+setup: venv-create requirements ipykernel-install ## Sets up the environment for development
+
+teardown: ipykernel-uninstall venv-remove ## Removes the environment for development
+
+# Virtual environment
+
+venv-create: ## Creates the virtual environment for this project
+	$(CREATE_VENV)
+
+venv-remove: ## Removes the virtual environment for this project
+	$(REMOVE_VENV)
 
 # Requirements
 
@@ -70,7 +104,7 @@ docs-clean: ## Cleans the generated documentation
 	@cd docs/ && $(RUN_PRE) make clean
 
 docs-apigen: ## Generates the API documentation files
-	@cd docs/ && $(RUN_PRE) sphinx-apidoc -e -M -o api ../spines
+	@cd docs/ && $(RUN_PRE) sphinx-apidoc -e -M -o api ../src/spines
 
 # Cleaning
 
@@ -81,22 +115,45 @@ clean-build: ## Clean out the compiled package files
 	@rm -rf build/*.*
 	@rm -rf dist/*.*
 
-# Packaging
+# Changes
+
+changelog: ## Generates the new CHANGELOG.md file
+	$(INVOKE) release.changelog
+
+changelog-draft: ## Generates the draft new CHANGELOG.draft.md file
+	$(INVOKE) release.changelog --draft
+
+# IPyKernel
+
+ipykernel-install:  ## Installs the IPyKernel for this environment
+	$(INVOKE) install.ipykernel
+
+ipykernel-uninstall: ## Uninstalls the IPyKernel for this environment
+	$(INVOKE) uninstall.ipykernel
+
+# Code
 
 lint: ## Lint using flake8
-	$(FLAKE8) spines/
+	$(FLAKE8) src/spines/
 
 coverage: ## Runs code coverage checks over the codebase
-	$(UNIT_TEST) --cov=spines tests/
+	$(UNIT_TEST) --cov=src/spines tests/
+
+# Unit testing
 
 test: ## Run the unit tests over the project
 	$(UNIT_TEST) tests/
+
+test-tox: ## Run the tox unit tests over the project
+	$(TOX)
+
+# Distribution
 
 build: clean-build ## Builds the library package
 	$(PYTHON) setup.py sdist
 	$(PYTHON) setup.py bdist_wheel
 
-check: ## Check the ubilt packages prior to uploading
+check-build: ## Check the built packages prior to uploading
 	$(TWINE) check dist/*
 
 upload: ## Uploads the package to the PyPI server

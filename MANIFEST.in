@@ -1,2 +1,2 @@
 include versioneer.py
-include spines/_version.py
+include src/spines/_version.py

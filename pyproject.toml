@@ -1,0 +1,42 @@
+[tool.towncrier]
+package = "spines"
+filename = "CHANGELOG.rst"
+issue_format = "`#{issue} <https://github.com/douglasdaly/spines/issues/{issue}>`_"
+directory = "changes/"
+title_format = "[{version}] - {project_date}"
+template = "changes/template.nonum.rst"
+
+  [[tool.towncrier.type]]
+  directory = "added"
+  name = "Added"
+  showcontent = true
+
+  [[tool.towncrier.type]]
+  directory = "changed"
+  name = "Changed"
+  showcontent = true
+
+  [[tool.towncrier.type]]
+  directory = "deprecated"
+  name = "Deprecated"
+  showcontent = true
+
+  [[tool.towncrier.type]]
+  directory = "removed"
+  name = "Removed"
+  showcontent = true
+
+  [[tool.towncrier.type]]
+  directory = "fixed"
+  name = "Fixed"
+  showcontent = true
+
+  [[tool.towncrier.type]]
+  directory = "security"
+  name = "Security"
+  showcontent = true
+
+  [[tool.towncrier.type]]
+  directory = "misc"
+  name = "Trivial"
+  showcontent = false

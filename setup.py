@@ -25,33 +25,43 @@ def read(file):
 
 setup(
     name='spines',
-    description='Skeletons for parameterized models.',
-    packages=find_packages(include=['spines', 'spines.*']),
-    long_description=read('README.md'),
-    long_description_content_type='text/markdown',
+    description='Backbones for parameterized models.',
+    package_dir={'': 'src'},
+    packages=find_packages('src', include=['spines', 'spines.*']),
+    include_package_data=True,
 
     author='Douglas Daly',
-    author_email='me@douglasdaly.com',
+    author_email='contact@douglasdaly.com',
     url='https://www.github.com/douglasdaly/spines',
     project_urls={
         'Source Code': 'https://www.github.com/douglasdaly/spines',
         'Documentation': 'https://spines.readthedocs.io/',
     },
+    long_description=read('README.md'),
+    long_description_content_type='text/markdown',
 
     version=versioneer.get_version(),
     cmdclass=versioneer.get_cmdclass(),
+    install_requires=[
+        'parver',
+    ],
     tests_require=[
         'pytest',
+        'pytest-cov',
     ],
-    include_package_data=True,
+    setup_requires=[
+        'pytest-runner',
+    ],
 
     license='MIT',
     keywords="spines parameterized models",
     classifiers=[
         'Development Status :: 2 - Pre-Alpha',
+        'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
         'Intended Audience :: Science/Research',
-        'License :: OSI Approved :: MIT License',
-        'Programming Language :: Python :: 3',
         'Topic :: Scientific/Engineering',
+        'License :: OSI Approved :: MIT License',
     ],
 )

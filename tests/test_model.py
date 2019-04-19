@@ -8,37 +8,35 @@ Unit tests for the Model class.
 import os
 import tempfile
 
-from spines import Model
+from spines import Model, Parameter
 
 
 #
 #   Helpers
 #
 
-class ModelTestImpl(Model):
+class LineModel(Model):
     """Test model class"""
+    m = Parameter(float)
+    b = Parameter(float)
 
-    def construct(self, *args, **kwargs):
-        return True
+    def fit(self, x, y, intercept=0.):
+        self.b = intercept
+        self.m = (y-intercept) / x
 
-    def fit(self):
-        return
+    def predict(self, x):
+        return self.m * x + self.b
 
-    def transform(self):
-        return
+    def score(self, x, y):
+        pred_y = self.predict(x)
+        return (y - pred_y) ** 2
 
 
 def model_file_function(fmt, new):
     """Tests the load/save capabilities of the Model class"""
     fmt = fmt.lower()
 
-    test_mod = ModelTestImpl()
-
-    test_mod.add_parameter('test', float)
-    test_mod.add_hyper_parameter('test hp', float)
-
-    test_mod.set_parameter('test', 1.0)
-    test_mod.set_hyper_parameter('test hp', 2.0)
+    test_mod = LineModel()
 
     file_ext = test_mod._get_file_extension(fmt)
     tmp = tempfile.mktemp(suffix=file_ext)
@@ -46,7 +44,7 @@ def model_file_function(fmt, new):
         _ = test_mod.save(tmp, fmt=fmt)
         assert os.path.isfile(tmp)
 
-        load_mod = ModelTestImpl.load(tmp, fmt=fmt, new=new)
+        load_mod = LineModel.load(tmp, fmt=fmt, new=new)
         for param, value in load_mod.parameters.items():
             assert test_mod.parameters[param] == value
     finally:

@@ -9,7 +9,8 @@ import os
 import pickle
 import tempfile
 
-from spines.parameters.base import ParameterStore, Parameter
+from spines.parameters.base import Parameter
+from spines.parameters.store import ParameterStore
 
 
 #

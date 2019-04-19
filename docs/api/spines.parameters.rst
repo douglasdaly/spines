@@ -14,4 +14,5 @@ spines.parameters
     spines.parameters.core
     spines.parameters.factories
     spines.parameters.mixins
+    spines.parameters.store
 

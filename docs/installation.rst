@@ -2,15 +2,15 @@
 Installation
 ############
 
-You can install ``spines`` in one of two ways: either from the PyPI package
-(the most common way) or from the source code.
+You can install ``spines`` in one of two ways: either from the PyPI
+package (the most common way) or from the source code.
 
 
 Package
 =======
 
-To install the ``spines`` package follow the instructions for your package
-manager below.
+To install the ``spines`` package follow the instructions for your
+package manager below.
 
 pip
 ---
@@ -31,11 +31,11 @@ pipenv
 Source
 ======
 
-To install the ``spines`` package from the source code first clone the git
-repository:
+To install the ``spines`` package from the source code first clone the
+git repository:
 
 .. code-block:: bash
 
     $ git clone https://github.com/douglasdaly/spines.git
 
-Then install with you preferred package manager.
+Then install with your preferred package manager.
