@@ -7,8 +7,10 @@ matrix:
       dist: xenial
       sudo: true
 install:
-  - pip install pipenv
+  - pip install pipenv python-coveralls
   - pipenv install --dev
 script:
   - make test
-
+  - make coverage
+after_success:
+  - coveralls
