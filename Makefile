@@ -1,16 +1,29 @@
+#!make
+
 ###############################################################################
 # CONFIGURATION                                                               #
 ###############################################################################
-
-PROJECT_DIR := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
-
-PYTHON = python
-PKG_MGR = pipenv
 
 
 ###############################################################################
 # SETUP                                                                       #
 ###############################################################################
+
+include .env
+
+PROJECT_DIR := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
+
+ifndef PYTHON
+	PYTHON = python
+endif
+
+ifndef PKG_MGR
+	PKG_MGR = pipenv
+endif
+
+ifndef TODO_CMD
+	TODO_CMD = todo
+endif
 
 SUBDIR_ROOTS := docs src tests
 DIRS := . $(shell find $(SUBDIR_ROOTS) -type d)
@@ -58,9 +71,9 @@ UNIT_TEST := $(RUN_PRE) $(UNIT_TEST)
 .PHONY: help setup teardown \
 		venv-create venv-remove \
         requirements requirements-generate \
-        docs docs-clean \
+        docs docs-clean docs-apigen docs-makegen \
         clean clean-build \
-		changelog changelog-draft \
+		changes changes-draft changelog changelog-draft \
 		ipykernel-install ipykernel-uninstall \
 		lint coverage \
 		test test-tox \
@@ -72,7 +85,7 @@ help: ## Displays this help message
 	@printf 'Usage: make \033[36m[target]\033[0m\n'
 	@echo ''
 	@echo 'Available targets:'
-	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-30s\033[0m %s\n", $$1, $$2}'
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' Makefile | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-30s\033[0m %s\n", $$1, $$2}'
 	@echo ''
 
 setup: venv-create requirements ipykernel-install ## Sets up the environment for development
@@ -106,6 +119,9 @@ docs-clean: ## Cleans the generated documentation
 docs-apigen: ## Generates the API documentation files
 	@cd docs/ && $(RUN_PRE) sphinx-apidoc -e -M -o api ../src/spines
 
+docs-makegen: ## Generates the API documentation for this Makefile
+	$(INVOKE) docs.generate-make
+
 # Cleaning
 
 clean: ## Delete all compiled Python files or temp files
@@ -116,6 +132,12 @@ clean-build: ## Clean out the compiled package files
 	@rm -rf dist/*.*
 
 # Changes
+
+changes: ## Generates the changes files from the todo files
+	$(INVOKE) develop.todos
+
+changes-draft: ## Genereates the draft changes from the todo files
+	$(INVOKE) develop.todos --draft
 
 changelog: ## Generates the new CHANGELOG.md file
 	$(INVOKE) release.changelog

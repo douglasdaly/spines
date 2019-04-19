@@ -15,9 +15,12 @@ import re
 
 import invoke
 
+from .helpers import VERSION
+from .helpers import ctx_run
 from .helpers import log as hlog
 from .helpers import print_block
-from .helpers import VERSION
+
+from .develop import todos
 
 
 #
@@ -26,6 +29,10 @@ from .helpers import VERSION
 
 def log(msg, level=None):
     hlog(msg, name='release', level=level)
+
+
+def run(ctx, cmd, draft):
+    return ctx_run(ctx, cmd, draft=draft, log_fn=log)
 
 
 def insert_text(original, new, after):
@@ -101,7 +108,8 @@ def changelog_rst_to_md(ctx, path):
 @invoke.task
 def changelog(ctx, draft=False):
     """Generates the CHANGELOG file"""
-    rel_ver = ctx.run('git rev-parse --abbrev-ref HEAD').stdout.strip()
+    todos(ctx, draft=draft)
+    rel_ver = ctx.run('git rev-parse --abbrev-ref HEAD', hide=True).stdout
     if rel_ver.startswith('release') or rel_ver.startswith('hotfix'):
         rel_ver = rel_ver.split('/')[-1].strip('v')
     else:
@@ -109,14 +117,11 @@ def changelog(ctx, draft=False):
 
     curr_md = open('CHANGELOG.md', 'r').read()
     if draft:
-        ctx.run(f"towncrier --draft --version {rel_ver} > CHANGELOG.draft.rst")
+        ctx.run(f"towncrier --draft --version {rel_ver} > CHANGELOG.draft.rst",
+                hide=True)
         log('Would clear changes/*')
         md_content = changelog_rst_to_md(ctx, 'CHANGELOG.draft.rst')
         new_md = insert_text(curr_md, md_content, "[//]: # (BEGIN)")
-        with open('CHANGELOG.draft.md', 'w') as fout:
-            fout.writelines(new_md)
-        log('Generated: CHANGELOG.draft.md')
-        ctx.run('git add CHANGELOG.draft.md')
         rst_content = open('CHANGELOG.draft.rst', 'r').read()
         os.remove('CHANGELOG.draft.rst')
         log('Would create new docs/changelog file:')
@@ -126,7 +131,7 @@ def changelog(ctx, draft=False):
         if os.path.exists('CHANGELOG.draft.md'):
             os.remove('CHANGELOG.draft.md')
             ctx.run('git add CHANGELOG.draft.md')
-        ctx.run(f'towncrier --version {rel_ver} --yes')
+        ctx.run(f'towncrier --version {rel_ver} --yes', hide=True)
         ctx.run('git add changes/')
         md_content = changelog_rst_to_md(ctx, 'CHANGELOG.rst')
         new_md = insert_text(curr_md, md_content, "[//]: # (BEGIN)")
@@ -140,4 +145,3 @@ def changelog(ctx, draft=False):
         ctx.run('git add %s' % doc_file)
 
     return
-

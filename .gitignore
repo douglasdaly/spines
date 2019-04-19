@@ -73,3 +73,10 @@ target/
 
 # Jupyter NB Checkpoints
 .ipynb_checkpoints/
+
+# TODO related
+*.bak
+
+# Misc.
+*~
+

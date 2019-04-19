@@ -133,6 +133,7 @@ in-depth example.
     contributing
     conduct
     authors
+    development/development.main
     changelogs/changelogs
     license
 

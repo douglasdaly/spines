@@ -4,7 +4,7 @@ filename = "CHANGELOG.rst"
 issue_format = "`#{issue} <https://github.com/douglasdaly/spines/issues/{issue}>`_"
 directory = "changes/"
 title_format = "[{version}] - {project_date}"
-template = "changes/template.nonum.rst"
+template = "changes/template.rst"
 
   [[tool.towncrier.type]]
   directory = "added"

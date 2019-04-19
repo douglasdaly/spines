@@ -1,0 +1,30 @@
+Usage: make [target]
+
+Available targets:
+  build                          Builds the library package
+  changelog-draft                Generates the draft new CHANGELOG.draft.md file
+  changelog                      Generates the new CHANGELOG.md file
+  changes-draft                  Genereates the draft changes from the todo files
+  changes                        Generates the changes files from the todo files
+  check-build                    Check the built packages prior to uploading
+  clean-build                    Clean out the compiled package files
+  clean                          Delete all compiled Python files or temp files
+  coverage                       Runs code coverage checks over the codebase
+  docs-apigen                    Generates the API documentation files
+  docs-clean                     Cleans the generated documentation
+  docs                           Generates the sphinx HTML documentation
+  docs-makegen                   Generates the API documentation for this Makefile
+  help                           Displays this help message
+  ipykernel-install              Installs the IPyKernel for this environment
+  ipykernel-uninstall            Uninstalls the IPyKernel for this environment
+  lint                           Lint using flake8
+  requirements-generate          Generates the project's requirements.txt file
+  requirements                   Installs Python dependencies
+  setup                          Sets up the environment for development
+  teardown                       Removes the environment for development
+  test                           Run the unit tests over the project
+  test-tox                       Run the tox unit tests over the project
+  upload                         Uploads the package to the PyPI server
+  venv-create                    Creates the virtual environment for this project
+  venv-remove                    Removes the virtual environment for this project
+
