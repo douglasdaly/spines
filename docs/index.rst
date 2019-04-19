@@ -4,6 +4,10 @@ Spines
 
 **Backbones for parameterized models.**
 
+|travis| |nbsp| |cov| |nbsp| |docs| |nbsp| |pypi| |nbsp| |status| |nbsp|
+|pyvers|
+
+
 About
 =====
 
@@ -139,3 +143,25 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
+
+
+.. |pyvers| image:: https://img.shields.io/pypi/pyversions/spines.svg
+    :target: https://pypi.org/projects/spines/
+    :alt: Supported Python Versions
+.. |pypi| image:: https://img.shields.io/pypi/v/spines.svg
+    :target: https://pypi.org/projects/spines/
+    :alt: PyPI
+.. |status| image:: https://img.shields.io/pypi/status/spines.svg
+    :target: https://pypi.org/projects/spines/
+    :alt: Status
+.. |docs| image:: https://readthedocs.org/projects/spines/badge/?version=latest
+    :target: https://readthedocs.org/projects/spines/
+    :alt: Documentation
+.. |travis| image:: https://travis-ci.org/douglasdaly/spines.svg?branch=master
+    :target: https://travis-ci.org/douglasdaly/spines
+    :alt: Travis-CI
+.. |cov| image:: https://coveralls.io/repos/github/douglasdaly/spines/badge.svg
+    :target: https://coveralls.io/github/douglasdaly/spines
+    :alt: Coverage
+.. |nbsp| unicode:: 0xA0
+   :trim:

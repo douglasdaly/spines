@@ -31,7 +31,7 @@ setup(
     include_package_data=True,
 
     author='Douglas Daly',
-    author_email='me@douglasdaly.com',
+    author_email='contact@douglasdaly.com',
     url='https://www.github.com/douglasdaly/spines',
     project_urls={
         'Source Code': 'https://www.github.com/douglasdaly/spines',
@@ -57,9 +57,11 @@ setup(
     keywords="spines parameterized models",
     classifiers=[
         'Development Status :: 2 - Pre-Alpha',
+        'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
         'Intended Audience :: Science/Research',
-        'License :: OSI Approved :: MIT License',
-        'Programming Language :: Python :: 3',
         'Topic :: Scientific/Engineering',
+        'License :: OSI Approved :: MIT License',
     ],
 )
