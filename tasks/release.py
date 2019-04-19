@@ -14,10 +14,10 @@ import os
 import re
 
 import invoke
-import parver
 
 from .helpers import log as hlog
 from .helpers import print_block
+from .helpers import VERSION
 
 
 #
@@ -71,32 +71,26 @@ def create_docs_changelog(new_entry, write=True):
 def convert_rst_to_markdown(content):
     """Convert an rst file to markdown"""
     ret = list()
-    curr = content.split('\n')
-    print(content)
+    curr = content.splitlines(keepends=False)
     for i in range(len(curr)):
-        line = curr[i].strip('>')
-        nxt = curr[i+1] if i+1 < len(curr) else None
-
-        if all(x in ('-', '=') for x in line):
-            continue
-        if nxt:
-            if all(x == '=' for x in nxt):
-                line = "## %s\n" % line
-            elif all(x == '-' for x in nxt):
-                line = "### %s\n" % line
+        line = curr[i].strip('>').strip()
+        if line.startswith('#'):
+            line = '#%s' % line
         ret.append(line)
-    return '\n'.join(ret) + '\n\n'
+    return '\n' + '\n'.join(ret) + '\n'
 
 
 def changelog_rst_to_md(ctx, path):
     """Convert a CHANGELOG.rst to a CHANGELOG.md file"""
     content = ctx.run(
-        'pandoc %s -f rst -t markdown' % path, hide=True
+        'pandoc %s -f rst -t commonmark' % path, hide=True
     ).stdout.strip()
+
     content = re.sub(
         r"([^\n]+)\n?\s+\[[\\]+(#\d+)\]\(https://github\.com/douglasdaly/[\w\-]+/issues/\d+\)",  # noqa
         r"\1 \2", content, flags=re.MULTILINE
     )
+
     return convert_rst_to_markdown(content)
 
 
@@ -107,9 +101,15 @@ def changelog_rst_to_md(ctx, path):
 @invoke.task
 def changelog(ctx, draft=False):
     """Generates the CHANGELOG file"""
+    rel_ver = ctx.run('git rev-parse --abbrev-ref HEAD').stdout.strip()
+    if rel_ver.startswith('release') or rel_ver.startswith('hotfix'):
+        rel_ver = rel_ver.split('/')[-1].strip('v')
+    else:
+        rel_ver = VERSION
+
     curr_md = open('CHANGELOG.md', 'r').read()
     if draft:
-        ctx.run("towncrier --draft > CHANGELOG.draft.rst")
+        ctx.run(f"towncrier --draft --version {rel_ver} > CHANGELOG.draft.rst")
         log('Would clear changes/*')
         md_content = changelog_rst_to_md(ctx, 'CHANGELOG.draft.rst')
         new_md = insert_text(curr_md, md_content, "[//]: # (BEGIN)")
@@ -123,18 +123,19 @@ def changelog(ctx, draft=False):
         print_block(create_docs_changelog(rst_content, write=False))
 
     else:
-        ctx.run('git rm CHANGELOG.draft.md')
-        ctx.run('towncrier --yes')
+        if os.path.exists('CHANGELOG.draft.md'):
+            os.remove('CHANGELOG.draft.md')
+            ctx.run('git add CHANGELOG.draft.md')
+        ctx.run(f'towncrier --version {rel_ver} --yes')
         ctx.run('git add changes/')
-        md_content = ctx.run(
-            'pandoc CHANGELOG.rst -f rst -t markdown', hide=True
-        ).stdout.strip()
-        new_md = insert_text(curr_md, md_content, "[//] # (BEGIN)")
+        md_content = changelog_rst_to_md(ctx, 'CHANGELOG.rst')
+        new_md = insert_text(curr_md, md_content, "[//]: # (BEGIN)")
         with open('CHANGELOG.md', 'w') as fout:
             fout.writelines(new_md)
         ctx.run('git add CHANGELOG.md')
         rst_content = open('CHANGELOG.rst', 'r').read()
         os.remove('CHANGELOG.rst')
+        ctx.run('git add CHANGELOG.rst')
         doc_file = create_docs_changelog(rst_content)
         ctx.run('git add %s' % doc_file)
 
