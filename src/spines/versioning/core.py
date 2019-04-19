@@ -7,10 +7,7 @@ Core functionality for the spines versioning package.
 #
 import difflib
 import inspect
-import os
-import py_compile
 import re
-import tempfile
 from textwrap import dedent
 from typing import List
 import unicodedata

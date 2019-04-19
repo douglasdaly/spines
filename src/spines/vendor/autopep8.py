@@ -52,7 +52,6 @@ import keyword
 import locale
 import os
 import re
-import signal
 import sys
 import textwrap
 import token
