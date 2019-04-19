@@ -20,10 +20,10 @@ from spines import __version__
 # -- Project information -----------------------------------------------------
 
 project = 'Spines'
-copyright = '2019, Douglas Daly'
+copyright = '2017-2019, Douglas Daly'
 author = 'Douglas Daly'
 
-release = __version__
+release = __version__.split('+')[0].strip()
 version = '.'.join(release.split('.')[:2])
 
 # -- General configuration ---------------------------------------------------
