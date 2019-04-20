@@ -5,6 +5,10 @@ Base classes for the spines versioning package.
 #
 #   Imports
 #
+import hashlib
+from types import FunctionType
+from typing import Dict
+
 import parver
 
 from .core import slugify
@@ -130,4 +134,69 @@ class Signature(object):
     """
     Signature objects for component change tracking and management
     """
-    pass
+
+    def __init__(self, obj):
+        self._name = obj.__name__
+        self._type = 'class' if isinstance(obj, type) else type(obj).__name__
+        self._desc = obj.__doc__
+        self._hash = self._get_hash(obj)
+
+    def __str__(self):
+        return '%s(%s) @ %s' % (self._name, self._type, self.hash[-8:])
+
+    def __repr__(self):
+        return '<Signature: type="%s" name="%s" hash="%s">' % (
+            self._type, self._name, self.hash[-8:]
+        )
+
+    @property
+    def name(self):
+        """str: The name of the object this signature is for"""
+        return self._name
+
+    @property
+    def type(self):
+        """str: The type of object this signature is for"""
+        return self._type
+
+    @property
+    def description(self):
+        """str: The description (docstring) for this object, if any"""
+        return self._desc
+
+    @property
+    def hash(self):
+        """str: Full hash (in hex string format) for this signature"""
+        return self._hash.hex()
+
+    @property
+    def hash_bytes(self):
+        """bytes: Full hash (in bytes) for this signature"""
+        return self._hash
+
+    @classmethod
+    def _get_hash(cls, obj) -> [bytes, None]:
+        """Gets the hash for the given object"""
+        all_bytes = cls._get_bytes_dict(obj)
+        if all_bytes:
+            m = hashlib.sha256()
+            for k in sorted(all_bytes.keys()):
+                m.update(all_bytes[k])
+            return m.digest()
+        return None
+
+    @staticmethod
+    def _get_bytes_dict(obj) -> Dict[str, bytes]:
+        """Gets an OrderedDictionary of bytes for object components"""
+        ret = dict()
+        if isinstance(obj, FunctionType):
+            ret[obj.__name__] = obj.__code__.co_code
+        elif isinstance(obj, (type, object)):
+            for k, v in obj.__dict__.items():
+                if not isinstance(v, FunctionType):
+                    continue
+                ret[k] = v.__code__.co_code
+        else:
+            if hasattr(obj, '__code__'):
+                ret['0'] = obj.__code__.co_code
+        return ret
