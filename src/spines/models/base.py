@@ -75,21 +75,27 @@ class Model(object, metaclass=ABCMeta):
 
     # Core methods
 
-    def build(self, *args, **kwargs) -> None:
-        """Builds the model
+    def construct(self, *args, **kwargs) -> None:
+        """Constructs the model
 
         Parameters
         ----------
         args : optional
-            Arguments to use in building the model.
+            Arguments to use in constructing the model.
         kwargs : optional
-            Keyword arguments to use in building the model.
+            Keyword arguments to use in constructing the model.
 
         """
         return
 
-    def fit(self, *args, **kwargs) -> None:
+    def fit(self, *args, **kwargs) -> [None, Dict]:
         """Fits the model
+
+        Generally this method is used for a single iteration of model
+        fitting (and for simple models this may be the only call
+        which is required).  The :obj:`train` method can call this
+        function multiple times and update the model iteratively (where
+        that approach is appropriate).
 
         Parameters
         ----------
@@ -97,6 +103,39 @@ class Model(object, metaclass=ABCMeta):
             Arguments to use in fit call.
         kwargs : optional
             Any additional keyword arguments to use in fit call.
+
+        Returns
+        -------
+        :obj:`None` or :obj:`dict`
+            Either returns `None` if adjustments to the model's
+            parameters happen internally, otherwise returns the
+            dictionary of updated parameters to apply.
+
+        See Also
+        --------
+        train
+
+        """
+        return
+
+    def train(self, *args, **kwargs) -> None:
+        """Trains the model, iteratively
+
+        This is the main training routine method for the model class.
+        It's generally used for training models such as neural networks
+        where you'll want to iteratively update the model (via ``fit``
+        calls), potentially based on different hyper-parameter settings.
+
+        Parameters
+        ----------
+        args : optional
+            Arguments to use in train call.
+        kwargs : optional
+            Any additional keyword arguments to use in the train call.
+
+        See Also
+        --------
+        fit
 
         """
         return
