@@ -163,7 +163,7 @@ Indices and tables
     :target: https://pypi.org/projects/spines/
     :alt: Status
 .. |docs| image:: https://readthedocs.org/projects/spines/badge/?version=latest
-    :target: https://readthedocs.org/projects/spines/
+    :target: https://spines.readthedocs.io/en/latest/
     :alt: Documentation
 .. |travis| image:: https://travis-ci.org/douglasdaly/spines.svg?branch=master
     :target: https://travis-ci.org/douglasdaly/spines
