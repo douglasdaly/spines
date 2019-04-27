@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Models for the spines library.
+Core modules and functions for the spines library.
 """
 from .model import Model
 

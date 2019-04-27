@@ -11,6 +11,7 @@ del get_versions
 from .core import Model
 from .parameters import Parameter, HyperParameter
 from .parameters import Bounded, HyperBounded
+from . import transforms
 from . import utils
 
 __all__ = [
@@ -22,5 +23,6 @@ __all__ = [
     'Bounded',
     'HyperBounded',
     # Submodules
+    'transforms',
     'utils',
 ]

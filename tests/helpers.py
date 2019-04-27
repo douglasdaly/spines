@@ -10,7 +10,7 @@ from spines import Parameter
 
 
 #
-#   Model classes
+#   Model
 #
 
 class LineModel(Model):

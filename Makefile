@@ -166,7 +166,7 @@ lint: ## Lint using flake8
 	$(FLAKE8) src/spines/
 
 coverage: ## Runs code coverage checks over the codebase
-	$(UNIT_TEST) --cov=src/spines tests/
+	$(PYTEST) --cov=src/spines tests/
 
 # Unit testing
 

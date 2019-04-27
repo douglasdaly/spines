@@ -15,16 +15,16 @@ from ..parameters.store import ParameterStore
 from ..utils.file import load_pickle
 from ..utils.file import save_pickle
 from . import decorators
-from .base import BaseObject
+from .base import BaseTransform
 
 
 #
-#   Class Definitions
+#   Model class
 #
 
-class Model(BaseObject):
+class Model(BaseTransform):
     """
-    Base Model class
+    Spines primary Model class
     """
     __hyperparam_store__ = ParameterStore
 
@@ -34,136 +34,10 @@ class Model(BaseObject):
         )
         return super().__init__(*args, **kwargs)
 
-    def __call__(self, *args, **kwargs):
-        return self.predict(*args, **kwargs)
-
     @property
     def hyper_parameters(self) -> Type[ParameterStore]:
         """ParameterStore: Hyper-parameters which are currently set."""
         return self._hyper_params
-
-    def construct(self, *args, **kwargs) -> None:
-        """Constructs the model
-
-        Parameters
-        ----------
-        args : optional
-            Arguments to use in constructing the model.
-        kwargs : optional
-            Keyword arguments to use in constructing the model.
-
-        """
-        return
-
-    def fit(self, *args, **kwargs) -> [None, Dict]:
-        """Fits the model
-
-        Generally this method is used for a single iteration of model
-        fitting (and for simple models this may be the only call
-        which is required).  The :obj:`train` method can call this
-        function multiple times and update the model iteratively (where
-        that approach is appropriate).
-
-        Parameters
-        ----------
-        args : optional
-            Arguments to use in fit call.
-        kwargs : optional
-            Any additional keyword arguments to use in fit call.
-
-        Returns
-        -------
-        :obj:`None` or :obj:`dict`
-            Either returns `None` if adjustments to the model's
-            parameters happen internally, otherwise returns the
-            dictionary of updated parameters to apply.
-
-        See Also
-        --------
-        train
-
-        """
-        return
-
-    def train(self, *args, **kwargs) -> None:
-        """Trains the model, iteratively
-
-        This is the main training routine method for the model class.
-        It's generally used for training models such as neural networks
-        where you'll want to iteratively update the model (via ``fit``
-        calls), potentially based on different hyper-parameter settings.
-
-        Parameters
-        ----------
-        args : optional
-            Arguments to use in train call.
-        kwargs : optional
-            Any additional keyword arguments to use in the train call.
-
-        See Also
-        --------
-        fit
-
-        """
-        return
-
-    @abstractmethod
-    def predict(self, *args, **kwargs):
-        """Predict outputs for the given inputs
-
-        Parameters
-        ----------
-        args : optional
-            Additional arguments to pass to predict call.
-        kwargs : optional
-            Additional keyword arguments to pass to predict call.
-
-        Returns
-        -------
-        object
-            Predictions from the given data.
-
-        """
-        pass
-
-    def score(self, *args, **kwargs) -> float:
-        """Returns the score measure of the model for the given data
-
-        Parameters
-        ----------
-        args : optional
-            Arguments (data inputs and outputs) to pass to the score
-            call.
-        kwargs : optional
-            Additional keyword-arguements to pass to the score call.
-
-        Returns
-        -------
-        float
-            Score for the model on the given inputs and outputs.
-
-        """
-        return
-
-    def error(self, *args, **kwargs) -> float:
-        """Returns the error measure of the model for the given data
-
-        Parameters
-        ----------
-        args : optional
-            Additional arguments to pass to the error call.
-        kwargs : optional
-            Additional keyword-arguments to pass to the error call.
-
-        Returns
-        -------
-        float
-            Error for the model on the given inputs and outputs.
-
-        """
-        return
-
-    # Hyper-parameters
 
     def set_hyper_params(self, **hyper_params) -> None:
         """Sets the values of this model's hyper-parameters
@@ -253,6 +127,113 @@ class Model(BaseObject):
 
         """
         return self._hyper_parameters.pop(name)
+
+    def fit(self, *args, **kwargs) -> [None, Dict]:
+        """Fits the model
+
+        Generally this method is used for a single iteration of model
+        fitting (and for simple models this may be the only call
+        which is required).  The :obj:`train` method can call this
+        function multiple times and update the model iteratively (where
+        that approach is appropriate).
+
+        Parameters
+        ----------
+        args : optional
+            Arguments to use in fit call.
+        kwargs : optional
+            Any additional keyword arguments to use in fit call.
+
+        Returns
+        -------
+        :obj:`None` or :obj:`dict`
+            Either returns `None` if adjustments to the model's
+            parameters happen internally, otherwise returns the
+            dictionary of updated parameters to apply.
+
+        See Also
+        --------
+        train, transform
+
+        """
+        return super().fit(*args, **kwargs)
+
+    def train(self, *args, **kwargs) -> None:
+        """Trains the model, iteratively
+
+        This is the main training routine method for the model class.
+        It's generally used for training models such as neural networks
+        where you'll want to iteratively update the model (via ``fit``
+        calls), potentially based on different hyper-parameter settings.
+
+        Parameters
+        ----------
+        args : optional
+            Arguments to use in train call.
+        kwargs : optional
+            Any additional keyword arguments to use in the train call.
+
+        See Also
+        --------
+        fit
+
+        """
+        return
+
+    def transform(self, *args, **kwargs):
+        """Transforms the given input data
+
+        Parameters
+        ----------
+        args : optional
+            Additional arguments to pass to predict call.
+        kwargs : optional
+            Additional keyword arguments to pass to predict call.
+
+        Returns
+        -------
+        object
+            Transformed inputs.
+
+        """
+        return self.predict(*args, **kwargs)
+
+    @abstractmethod
+    def predict(self, *args, **kwargs):
+        """Predict outputs for the given inputs
+
+        Parameters
+        ----------
+        args : optional
+            Additional arguments to pass to predict call.
+        kwargs : optional
+            Additional keyword arguments to pass to predict call.
+
+        Returns
+        -------
+        object
+            Predictions from the given data.
+
+        """
+        pass
+
+    def error(self, *args, **kwargs) -> float:
+        """Returns the error measure of the model for the given data
+
+        Parameters
+        ----------
+        args : optional
+            Additional arguments to pass to the error call.
+        kwargs : optional
+            Additional keyword-arguments to pass to the error call.
+
+        Returns
+        -------
+        float
+            Error for the model on the given inputs and outputs.
+
+        """
+        return
 
     def _save_helper(self, dir_path: str) -> List[str]:
         """Saves Model objects to the specified directory"""

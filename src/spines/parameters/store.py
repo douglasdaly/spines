@@ -44,8 +44,6 @@ class ParameterStore(MutableMapping):
         ret += "}"
         return ret
 
-    # Mapping functions
-
     @state_changed
     def __setitem__(self, k: str, v) -> None:
         self._values[k] = self._params[k](v)
@@ -63,8 +61,6 @@ class ParameterStore(MutableMapping):
 
     def __iter__(self) -> Iterator[str]:
         return iter(self._values)
-
-    # Properties
 
     @property
     def parameters(self) -> Dict[str, Parameter]:
@@ -85,8 +81,6 @@ class ParameterStore(MutableMapping):
     def final(self) -> bool:
         """bool: Whethor or not this set of parameters is finalized."""
         return self._finalized
-
-    # Helper methods
 
     def copy(self, deep: bool = False) -> Type['ParameterStore']:
         """Returns a copy of this parameter store object.
@@ -117,15 +111,13 @@ class ParameterStore(MutableMapping):
         self._values.clear()
         self._params.clear()
 
-    # Option methods
-
     @state_changed
     def add(self, parameter: Type[Parameter]) -> None:
         """Add a :class:`Parameter` specification to this store
 
         Parameters
         ----------
-        option : Parameter
+        parameter : Parameter
             :class:`Parameter` specification to add to this parameter
             store.
 

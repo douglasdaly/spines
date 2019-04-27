@@ -21,7 +21,9 @@ from .helpers import get_line_model
 
 @pytest.mark.usefixtures('class_line_model')
 class TestInitialization(object):
-    """Unit test for various model initialization code"""
+    """
+    Tests for various model initialization code
+    """
 
     @pytest.mark.parametrize('x, y', [(2.0, 2.5), (0.0, 1.0)])
     def test_auto_score_func(self, x, y):
@@ -30,7 +32,9 @@ class TestInitialization(object):
 
 
 class TestFitFunctions(object):
-    """Unit tests for model fitting functions"""
+    """
+    Tests for model fitting functions
+    """
 
     @pytest.mark.parametrize('x, y, intc', [(1.0, 2.0, 0.0), (1.0, 5.0, 1.0)])
     def test_line_model(self, x, y, intc):
@@ -41,7 +45,9 @@ class TestFitFunctions(object):
 
 @pytest.mark.usefixtures('class_line_model')
 class TestFileFunctions(object):
-    """Unit tests for Model file functions"""
+    """
+    Tests for Model file functions
+    """
 
     def test_zip_file(self):
         self._model_file_function(self.line_model, 'zip')

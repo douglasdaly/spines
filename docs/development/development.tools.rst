@@ -14,9 +14,11 @@ use.  It's not *strictly* necessary for getting up-and-running for
 development, but it specifies three important variables used by the
 Makefile:
 
-:PKG_MGR: The Python package manager to use (``pip`` or ``pipenv``)
-:PYTHON: The Python interpreter to use (``python`` or ``python3``)
-:TODO_CMD: The command you use to call the ``todo.sh``
+:PKG_MGR: The Python package manager to use (``pip`` or ``pipenv``).
+:PYTHON: The Python interpreter to use (``python`` or ``python3``).
+:TODO_CMD: The command you use to call the ``todo.sh``.
+:PYTEST_CORES: The number of processors to use for ``pytest`` (the
+    default is ``auto``).
 
 
 Makefile
@@ -137,5 +139,3 @@ wanted to set the priority for todo #2 to ``B``:
 .. code-block:: bash
 
     $ t pri 2 B
-
-

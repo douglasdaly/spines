@@ -6,7 +6,10 @@ Base classes for core spines library.
 #   Imports
 #
 from abc import ABC
+from abc import ABCMeta
+from abc import abstractmethod
 import tempfile
+from typing import Dict
 from typing import List
 from typing import Type
 
@@ -40,6 +43,12 @@ class BaseObject(ABC):
 
     def __str__(self):
         return self.__class__.__name__
+
+    def __repr__(self):
+        return '<%s version="%s" parameters="%s">' % (
+            self.__class__.__name__, self.__version__,
+            ', '.join(sorted(self.parameters.keys()))
+        )
 
     @property
     def parameters(self) -> Type[ParameterStore]:
@@ -130,8 +139,6 @@ class BaseObject(ABC):
         """
         return self._params.pop(name)
 
-    # Save/load functions
-
     def save(
         self, path: [None, str] = None, fmt: [None, str] = None
     ) -> str:
@@ -214,8 +221,6 @@ class BaseObject(ABC):
         instance._params = load_pickle(dir_path, 'parameters')
         return instance
 
-    # Helpers
-
     def _get_file_path(self) -> str:
         """Gets the default file path for saving to"""
         pass
@@ -241,6 +246,87 @@ class BaseObject(ABC):
         for method in get_overridden_methods(base_cls, self):
             setattr(self, method, override(getattr(self, method)))
         return
+
+
+class BaseTransform(BaseObject, metaclass=ABCMeta):
+    """
+    Base Transform class
+    """
+
+    def __init__(self, *args, **kwargs):
+        return super().__init__(*args, **kwargs)
+
+    def __call__(self, *args, **kwargs):
+        return self.transform(*args, **kwargs)
+
+    def construct(self, *args, **kwargs) -> None:
+        """Constructs the transformer prior to use
+
+        Parameters
+        ----------
+        args : optional
+            Arguments to use in constructing the transformer.
+        kwargs : optional
+            Keyword arguments to use in constructing the transformer.
+
+        """
+        return
+
+    def fit(self, *args, **kwargs) -> [Dict[str, object], None]:
+        """Fits the parameters for this transformation
+
+        Parameters
+        ----------
+        args
+            Data to use for fitting this Transformer.
+        kwargs : optional
+            Additional keyword-arguments to use in fit call.
+
+        Returns
+        -------
+        :obj:`dict` or :obj:`None`
+            Dictionary of updates from fit, or :obj:`None`.
+
+        """
+        return
+
+    def score(self, *args, **kwargs) -> float:
+        """Returns the score measure for this Transform
+
+        Parameters
+        ----------
+        args : optional
+            Arguments (data inputs and outputs) to pass to the score
+            call.
+        kwargs : optional
+            Additional keyword-arguements to pass to the score call.
+
+        Returns
+        -------
+        float
+            Score for the given inputs and outputs.
+
+        """
+        return
+
+    @abstractmethod
+    def transform(self, *args, **kwargs):
+        """Transforms the given data
+
+        Parameters
+        ----------
+        args
+            Data to perform transformation on.
+        kwargs : optional
+            Additional keyword arguments to use in transform call.
+
+        Returns
+        -------
+        object
+            Transformed inputs.
+
+        """
+        pass
 
 
 #
