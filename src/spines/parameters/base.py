@@ -45,8 +45,7 @@ class Parameter(object):
                 )
             self._required = False
         self._default = default
-
-    # dunder Methods
+        return
 
     def __call__(self, value):
         try:
@@ -75,8 +74,6 @@ class Parameter(object):
     def __str__(self) -> str:
         return self._name
 
-    # Descriptor methods
-
     def __set_name__(self, owner, name: str) -> None:
         self._name = name
         return
@@ -87,8 +84,6 @@ class Parameter(object):
 
     def __get__(self, instance, owner):
         return instance.parameters.get(self._name, None)
-
-    # Properties
 
     @property
     def name(self) -> str:
@@ -115,8 +110,6 @@ class Parameter(object):
         """bool: Whether or not this parameter is required to be set."""
         return self._required
 
-    # Methods
-
     def check(self, value) -> bool:
         """Checks the given `value` for validity
 
@@ -139,31 +132,6 @@ class Parameter(object):
 
         """
         return self._check_helper(value, raise_exceptions=False)
-
-    # Helper functions
-
-    def _check_helper(self, value, raise_exceptions=True) -> bool:
-        """Helper function for checking if a value is valid"""
-        if not isinstance(value, self.value_type):
-            if raise_exceptions:
-                raise InvalidParameterException(
-                    '%s: invalid type given: %s (required %s)' % (
-                        self.name, type(value),
-                        ', '.join([str(x) for x in self.value_type])
-                    )
-                )
-            return False
-
-        return True
-
-    def _disp_props(self):
-        """Helper function to get properties to display in name string"""
-        ret = list()
-        if self.required:
-            ret.append('required')
-        if self.default:
-            ret.append('default=%s' % self.default)
-        return ret
 
     def preprocess(self, value):
         """Pre-process/massage parameter values into correct type
@@ -211,6 +179,29 @@ class Parameter(object):
             except ValueError:
                 pass
         return value
+
+    def _check_helper(self, value, raise_exceptions=True) -> bool:
+        """Helper function for checking if a value is valid"""
+        if not isinstance(value, self.value_type):
+            if raise_exceptions:
+                raise InvalidParameterException(
+                    '%s: invalid type given: %s (required %s)' % (
+                        self.name, type(value),
+                        ', '.join([str(x) for x in self.value_type])
+                    )
+                )
+            return False
+
+        return True
+
+    def _disp_props(self):
+        """Helper function to get properties to display in name string"""
+        ret = list()
+        if self.required:
+            ret.append('required')
+        if self.default:
+            ret.append('default=%s' % self.default)
+        return ret
 
 
 class HyperParameter(Parameter):

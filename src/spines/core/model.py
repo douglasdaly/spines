@@ -29,16 +29,10 @@ class Model(BaseObject):
     __hyperparam_store__ = ParameterStore
 
     def __init__(self, *args, **kwargs):
-        super(Model, self).__init__(*args, **kwargs)
-
         self._hyper_params = self._create_store(
             self.__hyperparam_store__, HyperParameter
         )
-
-        self._modify_methods()
-
-    def __str__(self):
-        return self.__class__.__name__
+        return super().__init__(*args, **kwargs)
 
     def __call__(self, *args, **kwargs):
         return self.predict(*args, **kwargs)

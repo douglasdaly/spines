@@ -1,2 +1,4 @@
 (B) Implement Signature class +add
 (B) Versioning object for models +change
+(B) Add Transformer class for data +add
+(C) Implement default file path for Model +add

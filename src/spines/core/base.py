@@ -35,6 +35,8 @@ class BaseObject(ABC):
         self._params = self._create_store(
             self.__param_store__, Parameter
         )
+        self._modify_methods()
+        return
 
     def __str__(self):
         return self.__class__.__name__

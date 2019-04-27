@@ -28,6 +28,7 @@ class ParameterStore(MutableMapping):
         self._params = dict()
         self._values = dict()
         self._finalized = True
+        return
 
     def __repr__(self):
         ret = "<%s final=%s> {\n" % (self.__class__.__name__, self._finalized)
