@@ -75,7 +75,7 @@ TWINE := $(RUN_PRE) $(TWINE)
 .PHONY: help setup teardown \
 		venv-create venv-remove \
         requirements requirements-generate \
-        docs docs-clean docs-del-api docs-gen-api docs-makegen \
+        docs docs-clean docs-del-api docs-gen-api docs-gen-make \
         clean clean-build \
 		changes changes-draft changelog changelog-draft \
 		ipykernel-install ipykernel-uninstall \
@@ -123,10 +123,10 @@ docs-clean: ## Cleans the generated documentation
 docs-del-api: ## Removes the auto-generated API documentation files
 	@rm -f docs/api/*
 
-docs-gen-api: docs-del-apidocs ## Generates the API documentation files
+docs-gen-api: docs-del-api ## Generates the API documentation files
 	@cd docs/ && $(RUN_PRE) sphinx-apidoc -e -M -o api ../src/spines
 
-docs-makegen: ## Generates the API documentation for this Makefile
+docs-gen-make: ## Generates the API documentation for this Makefile
 	$(INVOKE) docs.generate-make
 
 # Cleaning
