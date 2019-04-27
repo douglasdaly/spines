@@ -35,7 +35,6 @@ class BaseObject(ABC):
         self._params = self._create_store(
             self.__param_store__, Parameter
         )
-        self._mark_overridden_methods()
 
     def __str__(self):
         return self.__class__.__name__
@@ -221,6 +220,7 @@ class BaseObject(ABC):
 
     def _modify_methods(self, *args, **kwargs) -> None:
         """Helper function to modify this classes methods"""
+        self._mark_overridden_methods()
         return
 
     @classmethod
@@ -235,8 +235,8 @@ class BaseObject(ABC):
     def _mark_overridden_methods(self) -> None:
         """Marks the methods overridden in this object's implementation
         """
-        for method in get_overridden_methods(type(self), self):
-            print(method)
+        base_cls = type(self).__bases__[-1]
+        for method in get_overridden_methods(base_cls, self):
             setattr(self, method, override(getattr(self, method)))
         return
 
