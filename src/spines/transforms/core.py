@@ -5,15 +5,15 @@ Core Transform classes for manipulating data.
 #
 #   Imports
 #
-from ..core.base import BaseTransform
 from ..parameters.base import Parameter
+from .base import Transform
 
 
 #
 #   Transform classes
 #
 
-class Pass(BaseTransform):
+class Pass(Transform):
     """
     Transform which simply passes the given values through
     """

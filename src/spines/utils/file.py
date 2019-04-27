@@ -71,7 +71,7 @@ def load_pickle(*path: Tuple[str]) -> object:
     return ret
 
 
-def get_extension(fmt: str) -> str:
+def get_archive_extension(fmt: str) -> str:
     """Gets the file extension based on format given
 
     Parameters
@@ -85,7 +85,7 @@ def get_extension(fmt: str) -> str:
         File extension to use for the given format.
 
     """
-    fmt = _clean_file_format(fmt)
+    fmt = _clean_archive_file_format(fmt)
     if fmt == 'lzma' or fmt.startswith('xz'):
         return '.tar.xz'
     elif fmt == 'bzip2' or fmt.startswith('bz'):
@@ -117,9 +117,9 @@ def save_archive(
     """
     if fmt is None:
         fmt = _DEFAULT_ARCHIVE_FORMAT
-    fmt = _clean_file_format(fmt)
+    fmt = _clean_archive_file_format(fmt)
 
-    file_ext = get_extension(fmt)
+    file_ext = get_archive_extension(fmt)
     if not path.endswith(file_ext):
         path = os.path.join(path, file_ext)
 
@@ -165,7 +165,7 @@ def extract_archive(
     if not fmt:
         fmt = _infer_archive_format(path)
     else:
-        fmt = _clean_file_format(fmt)
+        fmt = _clean_archive_file_format(fmt)
 
     if fmt == 'zip':
         h_archive = _get_zip_archive(path, 'r')
@@ -195,7 +195,7 @@ def _tar_mode_helper(mode: str, compression: str) -> str:
     if compression is None:
         return ret
     else:
-        compression = _clean_file_format(compression)
+        compression = _clean_archive_file_format(compression)
 
     if compression == 'lzma' or compression.startswith('xz'):
         return ret + ':xz'
@@ -234,6 +234,6 @@ def _infer_archive_format(path: str) -> str:
     raise ValueError("Cannot infer file format, please specify")
 
 
-def _clean_file_format(fmt: str):
+def _clean_archive_file_format(fmt: str) -> str:
     """Cleans the given file format string"""
     return fmt.lower().strip('.').strip(':')

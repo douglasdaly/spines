@@ -10,19 +10,21 @@ from typing import Dict
 from typing import List
 from typing import Type
 
-from ..parameters.base import HyperParameter
-from ..parameters.store import ParameterStore
-from ..utils.file import load_pickle
-from ..utils.file import save_pickle
-from . import decorators
-from .base import BaseTransform
+from .decorators import negate
+from .parameters.base import HyperParameter
+from .parameters.decorators import finalize_post
+from .parameters.decorators import finalize_pre
+from .parameters.store import ParameterStore
+from .transforms.base import Transform
+from .utils.file import load_pickle
+from .utils.file import save_pickle
 
 
 #
 #   Model class
 #
 
-class Model(BaseTransform):
+class Model(Transform):
     """
     Spines primary Model class
     """
@@ -254,14 +256,14 @@ class Model(BaseTransform):
         """Modifies the model's functions in-place on object creation"""
         super(Model, self)._modify_methods(*args, **kwargs)
 
-        self.fit = decorators.finalize_pre(self.fit, self._hyper_params)
-        self.fit = decorators.finalize_post(self.fit, self._params)
+        self.fit = finalize_pre(self.fit, self._hyper_params)
+        self.fit = finalize_post(self.fit, self._params)
 
         if (hasattr(self.error, '__is_overridden')
                 and not hasattr(self.score, '__is_overridden')):
-            self.score = decorators.inverse_from_func(self.score, self.error)
+            self.score = negate(self.error)
         elif (hasattr(self.score, '__is_overridden')
                 and not hasattr(self.error, '__is_overridden')):
-            self.error = decorators.inverse_from_func(self.error, self.score)
+            self.error = negate(self.score)
 
         return

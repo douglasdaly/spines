@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 """
-Transformation subpackage for the spines library.
+Transforms subpackage for spines.
 """
+from .base import Transform
 from .core import Pass
 
 __all__ = [
+    'Transform',
     'Pass',
 ]

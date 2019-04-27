@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Utilities for the spines models classes.
+Utilities for the spines core classes.
 """
 #
 #   Imports

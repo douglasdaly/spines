@@ -14,7 +14,7 @@ from typing import Dict
 from typing import List
 import unicodedata
 
-from ..vendor import autopep8
+from ..vendor import autopep8 as _v_autopep8
 
 
 #
@@ -70,7 +70,7 @@ def get_function_source(func):
 
     """
     raw_source = dedent(inspect.getsource(func))
-    return autopep8.fix_code(raw_source)
+    return _v_autopep8.fix_code(raw_source)
 
 
 def get_doc_string(obj):

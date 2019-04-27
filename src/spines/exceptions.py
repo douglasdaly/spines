@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 """
-Core exceptions classes for spines.
+Exceptions classes for spines.
 """
 #
 #   Imports
 #
-from .base import BaseObjectException
+from .core.base import BaseObjectException
 
 
 #

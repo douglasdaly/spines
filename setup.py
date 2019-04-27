@@ -44,6 +44,7 @@ setup(
     cmdclass=versioneer.get_cmdclass(),
     install_requires=[
         'parver',
+        'toml',
         'xxhash',
     ],
     tests_require=[

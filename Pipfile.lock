@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "be449484056e232559d9644e278d5e4d25135a4f79273d6c1070572e0c63d9a6"
+            "sha256": "a208c5d604153bbf2da31c1f8908f59cea619908a1b50f06b36e0e56726ad816"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -30,6 +30,13 @@
                 "sha256:58587dd4dc3daefad0487f6d9ae32b4542b185e1c36db6993290e7c41ca2b47c"
             ],
             "version": "==1.5"
+        },
+        "argopt": {
+            "hashes": [
+                "sha256:5110682e1c3459890f67690f364776573d40f2e81d6d3946ed6081ffa990f0d2",
+                "sha256:a4e55b2f4234389f3511d8287f264d3c321b4f27e407253ff8d268585862fd64"
+            ],
+            "version": "==0.5.0"
         },
         "arpeggio": {
             "hashes": [
@@ -181,6 +188,14 @@
             ],
             "index": "pypi",
             "version": "==3.7.7"
+        },
+        "git-fame": {
+            "hashes": [
+                "sha256:3fbe029e30ced193a67632b706652fda747994fb1812874151b97051b2161314",
+                "sha256:e89470dfa1a5e294ca70a53c88577c1787c0697152e8a3e52542b12af1150f20"
+            ],
+            "index": "pypi",
+            "version": "==1.8.0"
         },
         "idna": {
             "hashes": [
@@ -705,6 +720,12 @@
             "editable": true,
             "path": "."
         },
+        "tabulate": {
+            "hashes": [
+                "sha256:8af07a39377cee1103a5c8b3330a421c2d99b9141e9cc5ddd2e3263fea416943"
+            ],
+            "version": "==0.8.3"
+        },
         "terminado": {
             "hashes": [
                 "sha256:d9d012de63acb8223ac969c17c3043337c2fcfd28f3aea1ee429b345d01ef460",
@@ -724,6 +745,7 @@
                 "sha256:229f81c57791a41d65e399fc06bf0848bab550a9dfd5ed66df18ce5f05e73d5c",
                 "sha256:235682dd292d5899d361a811df37e04a8828a5b1da3115886b73cf81ebc9100e"
             ],
+            "index": "pypi",
             "version": "==0.10.0"
         },
         "tornado": {

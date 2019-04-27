@@ -3,3 +3,4 @@
 (C) Implement default file path for Model +add
 (C) Iteratively get dependent funcs in Version +change
 (A) Configuration object +add
+(C) Logging functionality +add
