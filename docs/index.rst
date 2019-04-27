@@ -2,10 +2,15 @@
 Spines
 ######
 
-**Backbones for parameterized models.**
+*Skeletons for parameterized models.*
 
 |travis| |nbsp| |cov| |nbsp| |docs| |nbsp| |pypi| |nbsp| |status| |nbsp|
 |pyvers|
+
+.. important::
+
+    This software is still in it's early alpha phase and is constantly
+    in flux.  It will likely change significantly.
 
 
 Installation

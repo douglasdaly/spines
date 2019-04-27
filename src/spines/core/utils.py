@@ -12,15 +12,15 @@ from typing import Type
 #   Functions
 #
 
-def get_overridden_methods(cls: type, obj: Type['spines.base.Model']):
+def get_overridden_methods(cls: type, obj: Type['spines.base.BaseObject']):
     """Get the overridden methods in an object.
 
     Parameters
     ----------
     cls : type
         Base class to compare against.
-    obj : Model
-        Model instance to get methods which are overridden.
+    obj : BaseObject
+        Object instance to get methods which are overridden.
 
     Returns
     -------

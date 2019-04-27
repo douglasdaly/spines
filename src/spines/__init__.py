@@ -2,11 +2,16 @@
 """
 Spines
 
-Backbones for parameterized models.
+Skeletons for parameterized models.
 """
-from .models import Model
+from ._version import get_versions
+__version__ = get_versions()['version']
+del get_versions
+
+from .core import Model
 from .parameters import Parameter, HyperParameter
 from .parameters import Bounded, HyperBounded
+from . import utils
 
 __all__ = [
     # Models
@@ -16,8 +21,6 @@ __all__ = [
     'HyperParameter',
     'Bounded',
     'HyperBounded',
+    # Submodules
+    'utils',
 ]
-
-from ._version import get_versions
-__version__ = get_versions()['version']
-del get_versions

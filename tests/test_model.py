@@ -10,6 +10,8 @@ import tempfile
 
 import pytest
 
+from spines import utils
+
 from .helpers import get_line_model
 
 
@@ -56,17 +58,18 @@ class TestFileFunctions(object):
     @staticmethod
     def _model_file_function(model, fmt):
         """Tests the load/save capabilities of the Model class"""
-        fmt = fmt.lower()
-        file_ext = model._get_file_extension(fmt)
+        file_ext = utils.file.get_extension(fmt)
         for new in [False, True]:
             tmp = tempfile.mktemp(suffix=file_ext)
             try:
-                _ = model.save(tmp, fmt=fmt)
+                tmp = model.save(tmp, fmt=fmt)
                 assert os.path.isfile(tmp)
 
                 load_mod = model.__class__.load(tmp, fmt=fmt, new=new)
                 for param, value in load_mod.parameters.items():
                     assert model.parameters[param] == value
+            except Exception:
+                raise
             finally:
                 os.remove(tmp)
         return

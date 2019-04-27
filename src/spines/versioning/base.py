@@ -1,54 +1,112 @@
 # -*- coding: utf-8 -*-
 """
-Base classes for the spines versioning package.
+Base classes for the spines versioning functionality.
 """
 #
 #   Imports
 #
-import hashlib
-import inspect
-from types import FunctionType
+from abc import ABC
+from abc import abstractmethod
+from hashlib import blake2s
 from typing import Dict
+from typing import Tuple
+from typing import Type
 
 import parver
+from xxhash import xxh64
 
 from .. import __version__
 from ..parameters.base import Parameter
-from .core import slugify
-from .core import get_function_source
+from .utils import slugify
 
 
 #
 #   Classes
 #
 
-class Version(object):
+class BaseSignature(ABC):
     """
-    Version object for versioning of spines models.
-    """
+    Base signature objects for component change tracking and management.
 
-    def __init__(self, obj, display_name=None, desc=None):
+    This object is used for tagging/version-tracking a single component
+    of a larger model (e.g. the ``fit`` method).  Collections of these
+    objects are used to identify, fully, a particular version of a
+    :class:`Model` instance.
+
+    """
+    _HASH = xxh64
+
+    def __init__(self, obj):
         if not isinstance(obj, type):
             obj = obj.__class__
-
         self._name = obj.__name__
-        self._display_name = display_name if display_name else self._name
-        self._desc = desc if desc else obj.__doc__
-        self._functions = self._get_functions(obj)
-        self._parameters = self._get_parameters(obj)
-        self._spines_version = __version__
-        self._tag = None
-        self._version = parver.Version((0, 0, 1), dev=None)
-
-    # dunder methods
-
-    def __repr__(self):
-        return "<Version name=%s version=%s>" % (self._name, self._version)
+        self._hash = self._get_hash(obj).digest()
 
     def __str__(self):
-        return '%s %s' % (self._name, self._version)
+        return '%s @ %s' % (self.name, self.hash[-8:])
 
-    # Properties
+    def __repr__(self):
+        return '<Signature: name="%s" hash="%s">' % (
+            self.name, self.hash[-8:]
+        )
+
+    @property
+    def hash(self) -> str:
+        """str: Full hash string for this signature's hash"""
+        return self._hash.hex()
+
+    @property
+    def hash_bytes(self) -> bytes:
+        """bytes: Full hash (in bytes-form) for this signature"""
+        return self._hash
+
+    @property
+    def name(self) -> str:
+        """str: The name of the object this signature is for"""
+        return self._name
+
+    @classmethod
+    def _get_hash(cls, obj) -> [bytes, None]:
+        """Gets the hash for the given object"""
+        m = cls._HASH()
+        m.update(cls._get_bytes(obj))
+        return m
+
+    @abstractmethod
+    @classmethod
+    def _get_bytes(cls, obj) -> bytes:
+        """Gets the relevant bytes for a single object"""
+        pass
+
+
+class BaseVersion(BaseSignature):
+    """
+    Base version object for versioning module.
+
+    Parameters
+    ----------
+    obj : object
+        The object to generate a version object for.
+
+    """
+    _HASH = blake2s
+
+    def __init__(self, obj):
+        if not isinstance(obj, type):
+            obj = obj.__class__
+        self._spines_version = __version__
+        self._desc = self._get_desc(obj)
+
+        super(BaseVersion, self).__init__(obj)
+
+        self._version = self._determine_next_version(
+            obj.__getattribute__('__version__', None)
+        )
+
+    def __repr__(self):
+        return '<Version: name="%s" version="%s">' % (
+            self.name, self.version
+        )
 
     @property
     def name(self) -> str:
@@ -56,34 +114,9 @@ class Version(object):
         return self._name
 
     @property
-    def display_name(self) -> str:
-        """str: Display name for the object versioned."""
-        return self._display_name
-
-    @display_name.setter
-    def display_name(self, value) -> None:
-        self._display_name = value
-        return
-
-    @property
     def description(self) -> str:
-        """str: Description for the object versioned."""
+        """str: Docstring for the main object versioned."""
         return self._desc
-
-    @description.setter
-    def description(self, value) -> None:
-        self._desc = value
-        return
-
-    @property
-    def functions(self) -> Dict[str, 'Signature']:
-        """dict: Functions in this version"""
-        return self._functions.copy()
-
-    @property
-    def parameters(self) -> Dict[str, Parameter]:
-        """dict: Parameters in this version"""
-        return self._parameters.copy()
 
     @property
     def slug(self) -> str:
@@ -99,21 +132,11 @@ class Version(object):
         return self._spines_version
 
     @property
-    def tag(self) -> str:
-        """str: Tag (if any) for this version."""
-        return self._tag
-
-    @tag.setter
-    def tag(self, value) -> None:
-        self._tag = value
-        return
-
-    @property
     def version(self) -> str:
         """str: Version string for this version object."""
         return str(self._version)
 
-    # Version actions
+    # Version switches
 
     def to_release(self) -> None:
         """Switches the version to release"""
@@ -135,138 +158,35 @@ class Version(object):
         self._version = self._version.clear(dev=True)
         return
 
-    def bump_dev(self) -> None:
-        """Bumps the dev number for use during iterative work."""
-        self._version = self._version.bump_dev()
+    # Versioning logic
+
+    def _get_next_version(
+        self,
+        prev_version: [Type['Version'], None]
+    ) -> Type[parver.Version]:
+        """Determines the next version from the previous"""
+        if prev_version is None:
+            return parver.Version((0, 0, 1), dev=None)
         return
 
-    def bump(self) -> None:
-        """Bumps this version's PATCH number by one."""
-        self._version = self._version.bump_release(index=2)
-        return
-
-    def bump_params(self) -> None:
-        """Bumps this version's MINOR number by one."""
-        self._version = self._version.bump_release(index=1)
-        return
-
-    def bump_code(self) -> None:
-        """Bumps this version's MAJOR number by one."""
-        self._version = self._version.bump_release(index=0)
-        return
-
-    # Component signatures
+    # Helper methods
 
     @classmethod
-    def _get_functions(cls, obj):
-        """Helper function to get individual model function signatures
+    def _get_desc(cls, obj) -> [str, None]:
+        """Helper function to get description of this versioned object
         """
-        ret = {}
-        for k, v in obj.__dict__.items():
-            if isinstance(v, FunctionType):
-                ret[k] = Signature(v)
-        return ret
+        return getattr(obj, '__doc__', None)
 
     @classmethod
-    def _get_parameters(cls, obj):
+    def _get_signatures_helper(
+        cls, obj, signature_cls: type, *allowed_types: Tuple[type]
+    ) -> Tuple[Dict[str, Type[Parameter]], Dict[str, Type['Signature']]]:
         """Helper function to get individual model parameters"""
-        ret = {}
+        if not allowed_types:
+            allowed_types = object
+        ret, sigs = {}, {}
         for k, v in obj.__dict__.items():
-            if isinstance(v, Parameter):
+            if isinstance(v, allowed_types):
                 ret[k] = v
-        return ret
-
-
-class Signature(object):
-    """
-    Signature objects for component change tracking and management.
-
-    This object is used for tagging/version-tracking a single component
-    of a larger model (e.g. the ``fit`` method).  Collections of these
-    objects are used to identify, fully, a particular version of a
-    :class:`Model` instance.
-
-    """
-
-    def __init__(self, obj):
-        self._name = obj.__name__
-        self._desc = obj.__doc__
-        self._code = self._get_code(obj)
-        self._parameters = self._get_parameters(obj)
-        self._hash = self._get_hash(obj)
-
-    def __str__(self):
-        return '%s @ %s' % (self.name, self.hash[-8:])
-
-    def __repr__(self):
-        return '<Signature: name="%s" hash="%s">' % (
-            self.name, self.hash[-8:]
-        )
-
-    @property
-    def code(self):
-        """str: The code for the function"""
-        return self._code
-
-    @property
-    def description(self):
-        """str: The description (docstring) for this object, if any"""
-        return self._desc
-
-    @property
-    def hash(self):
-        """str: Full hash (in hex string format) for this signature"""
-        return self._hash.hex()
-
-    @property
-    def hash_bytes(self):
-        """bytes: Full hash (in bytes) for this signature"""
-        return self._hash
-
-    @property
-    def name(self):
-        """str: The name of the object this signature is for"""
-        return self._name
-
-    @property
-    def parameters(self):
-        """dict: Parameters used in the function signature"""
-        return self._parameters
-
-    @classmethod
-    def _get_hash(cls, obj) -> [bytes, None]:
-        """Gets the hash for the given object"""
-        all_bytes = cls._get_bytes(obj)
-        if all_bytes:
-            m = hashlib.sha256()
-            m.update(all_bytes)
-            return m.digest()
-        return
-
-    @classmethod
-    def _get_bytes(cls, obj: FunctionType) -> [bytes, None]:
-        """Gets the relevant bytes for a single function object"""
-        if not hasattr(obj, '__code__'):
-            return None
-        bytecode = obj.__code__.co_code
-        consts = obj.__code__.co_consts[1:]
-        dep_objs = obj.__code__.co_names
-        all_vars = obj.__code__.co_varnames
-
-        ret = []
-        for v in (consts, dep_objs, all_vars):
-            for i_v in v:
-                ret.append('str:%s' % i_v)
-        return bytecode + ','.join(ret).encode()
-
-    @classmethod
-    def _get_code(cls, obj: FunctionType) -> str:
-        """Gets the code for the given function object"""
-        return get_function_source(obj)
-
-    @classmethod
-    def _get_parameters(cls, obj) -> Dict[str, object]:
-        """Gets the parameters for a function object"""
-        fn_sig = inspect.signature(obj)
-        return {k: None if v.default is fn_sig.empty else v.default
-                for k, v in fn_sig.parameters.items()}
+                sigs[k] = signature_cls(v)
+        return ret, sigs

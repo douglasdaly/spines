@@ -2,9 +2,8 @@
 """
 Models for the spines library.
 """
-from .base import Model
+from .model import Model
 
 __all__ = [
-    # Models
     'Model',
 ]

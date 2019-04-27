@@ -1,3 +1,2 @@
-(C) Refactor Model to extract file functions +change
 (B) Implement Signature class +add
 (B) Versioning object for models +change

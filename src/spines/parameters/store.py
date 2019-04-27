@@ -6,37 +6,13 @@ Parameter storage module.
 #   Imports
 #
 from collections.abc import MutableMapping
-from functools import wraps
-from typing import Dict, Iterator, Type
+from typing import Dict
+from typing import Iterator
+from typing import Type
 
 from .base import Parameter
 from .base import MissingParameterException
-
-
-#
-#   Decorators
-#
-
-def state_changed(func):
-    """Decorator indicating a function which changes the state
-
-    Parameters
-    ----------
-    func : callable
-        The function to wrap.
-
-    Returns
-    -------
-    callable
-        The wrapped function.
-
-    """
-    @wraps(func)
-    def wrapped(self, *args, **kwargs):
-        ret = func(self, *args, **kwargs)
-        self._finalized = False
-        return ret
-    return wrapped
+from .decorators import state_changed
 
 
 #
@@ -51,10 +27,7 @@ class ParameterStore(MutableMapping):
     def __init__(self):
         self._params = dict()
         self._values = dict()
-
         self._finalized = True
-
-    # dunder methods
 
     def __repr__(self):
         ret = "<%s final=%s> {\n" % (self.__class__.__name__, self._finalized)

@@ -23,6 +23,7 @@ tox = "*"
 twine = "*"
 versioneer = "*"
 wheel = "*"
+xxhash = "*"
 
 [packages]
 

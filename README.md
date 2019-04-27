@@ -2,7 +2,7 @@
 
 <img width="20%" align="right" src="./docs/_static/images/spines_logo_256.png" alt="Spines Logo" style="margin-left: 10px;">
 
-**Backbones for parameterized models.**
+*Skeletons for parameterized models.*
 
 [![Build Status](https://travis-ci.org/douglasdaly/spines.svg?branch=master)](https://travis-ci.org/douglasdaly/spines)
 [![Coverage Status](https://coveralls.io/repos/github/douglasdaly/spines/badge.svg)](https://coveralls.io/github/douglasdaly/spines)
@@ -10,6 +10,9 @@
 [![PyPI](https://img.shields.io/pypi/v/spines.svg)](https://pypi.org/project/spines/)
 [![Status](https://img.shields.io/pypi/status/spines.svg)](https://pypi.org/project/spines/)
 [![Python Versions](https://img.shields.io/pypi/pyversions/spines.svg)](https://pypi.org/project/spines/)
+
+**Important:** This software is still in it's early alpha phase and is 
+constantly in flux.  It will likely change significantly.
 
 
 ## Installation

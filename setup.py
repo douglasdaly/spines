@@ -44,6 +44,7 @@ setup(
     cmdclass=versioneer.get_cmdclass(),
     install_requires=[
         'parver',
+        'xxhash',
     ],
     tests_require=[
         'pytest',
