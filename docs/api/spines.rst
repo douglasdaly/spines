@@ -10,6 +10,12 @@ spines
 .. toctree::
     :caption: Subpackages
 
-    spines.models
+    spines.config
+    spines.core
+    spines.decorators
+    spines.exceptions
     spines.parameters
+    spines.project
+    spines.transforms
+    spines.utils
     spines.versioning

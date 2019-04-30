@@ -11,4 +11,4 @@ spines.versioning
 
     spines.versioning.base
     spines.versioning.core
-
+    spines.versioning.utils

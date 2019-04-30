@@ -9,8 +9,8 @@
 {{ underline * definitions[category]['name']|length }}
 
 {% if definitions[category]['showcontent'] %}{% for text, values in sections[section][category].items() %} - {{ text }}{% if values %}{% for value in values if not value.startswith('`#t') %} ({{ value }}) {% endfor %}{% endif %}
-{% endfor %}
 
+{% endfor %}
 
 {% else %} - {{ sections[section][category]['']|join(', ') }}{% endif %}
 

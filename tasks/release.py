@@ -193,7 +193,7 @@ def changelog(ctx, draft=False):
         if os.path.exists('CHANGELOG.draft.md'):
             os.remove('CHANGELOG.draft.md')
             ctx.run('git add CHANGELOG.draft.md')
-        ctx.run(f'towncrier --version {rel_ver} --yes', hide=True)
+        ctx.run(f'towncrier --yes --version {rel_ver}', hide=True)
         ctx.run('git add changes/')
         md_content = changelog_rst_to_md(ctx, 'CHANGELOG.rst')
         new_md = insert_text(curr_md, md_content, "[//]: # (BEGIN)")
