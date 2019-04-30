@@ -107,5 +107,6 @@ def todos(ctx, draft=False):
         log('Clearing file: todos/done.txt')
         open('todos/done.txt', 'w').close()
     run(ctx, 'git add todos/done.txt', draft)
+    run(ctx, 'git add todos/todo.txt', draft)
 
     return
