@@ -10,21 +10,20 @@ Available targets:
   clean-build                    Clean out the compiled package files
   clean                          Delete all compiled Python files or temp files
   coverage                       Runs code coverage checks over the codebase
-  docs-apigen                    Generates the API documentation files
   docs-clean                     Cleans the generated documentation
+  docs-gen-api                   Generates the API documentation files
   docs                           Generates the sphinx HTML documentation
-  docs-makegen                   Generates the API documentation for this Makefile
+  docs-gen-make                  Generates the API documentation for this Makefile
   help                           Displays this help message
   ipykernel-install              Installs the IPyKernel for this environment
   ipykernel-uninstall            Uninstalls the IPyKernel for this environment
   lint                           Lint using flake8
-  requirements-generate          Generates the project's requirements.txt file
+  requirements-gen               Generates the project's requirements.txt file
   requirements                   Installs Python dependencies
   setup                          Sets up the environment for development
   teardown                       Removes the environment for development
   test                           Run the unit tests over the project
   test-tox                       Run the tox unit tests over the project
+  test-watch                     Run pytest-watch to run tests on project changes
   upload                         Uploads the package to the PyPI server
-  venv-create                    Creates the virtual environment for this project
-  venv-remove                    Removes the virtual environment for this project
 
