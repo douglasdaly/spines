@@ -38,35 +38,21 @@ def get_config() -> Type[Config]:
     return _GLOBAL_CONFIG.copy()
 
 
-def set_config(*config: Tuple[Config], **settings) -> None:
-    """Sets/updates the global spines configuration
+def set_config(**settings) -> None:
+    """Sets global configuration setting(s)
 
     Parameters
     ----------
-    config : Config, optional
-        The new configuration object to use for the global
-        configuration.
-    settings : optional
-        The settings in the global configuration file to update.
+    settings
+        The setting(s) in the global configuration to update.
 
     """
     global _GLOBAL_CONFIG
-
-    if config:
-        config = config[0]
-    else:
-        config = _GLOBAL_CONFIG
-
-    if settings:
-        config.update(**settings)
-
-    _GLOBAL_CONFIG = config
+    _GLOBAL_CONFIG = _update_config(_GLOBAL_CONFIG, **settings)
     return
 
 
-# TODO: Finish implementing
-
-def load_config(*path: Tuple[str]) -> Type[Config]:
+def load_config(*path: Tuple[str], update: bool = False) -> None:
     """Loads the global spines configuration
 
     Parameters
@@ -74,17 +60,42 @@ def load_config(*path: Tuple[str]) -> Type[Config]:
     path : :obj:`str` (or multiple), optional
         File(s) to load the configuration from (defaults to the correct
         spines hierarchy for configuration files).
-
-    Returns
-    -------
-    Config
-        New global configuration object loaded.
+    update : bool, optional
+        Update the current configuration as opposed to replacing it with
+        the newly loaded on (default is :obj:`False`, replace it).
 
     """
+    global _GLOBAL_CONFIG
+
     if not path:
-        path = utils.get_default_config_paths()
+        path = utils.find_config_files('.')
+
+    if update:
+        config = _GLOBAL_CONFIG
+    else:
+        config = None
 
     for p in path:
-        t_config = utils.load_config(p)
+        config = _update_config(config, utils.load_config(p))
 
-    pass
+    _GLOBAL_CONFIG = config
+    return
+
+
+def _update_config(
+    config: Type[Config], *other: Tuple[Type[Config]], **settings
+) -> Type[Config]:
+    """Updates the given configuration object"""
+    if config is not None:
+        updated = config.copy()
+    else:
+        updated = other[0]
+        other = other[1:]
+
+    for other_cfg in other:
+        updated.update(other_cfg)
+
+    if settings:
+        updated.update(**settings)
+
+    return updated
