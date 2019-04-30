@@ -12,6 +12,8 @@ import datetime
 import glob
 import os
 import re
+import sys
+import tempfile
 
 import invoke
 
@@ -104,6 +106,66 @@ def changelog_rst_to_md(ctx, path):
 #
 #   Tasks
 #
+
+@invoke.task
+def authors(ctx, draft=False, branch='master'):
+    """Generates the AUTHORS file"""
+    _, tmp = tempfile.mkstemp(suffix='.csv')
+    try:
+        log('Getting contributions')
+        ctx.run(f'git fame --log ERROR --branch {branch} --format csv > {tmp}')
+        fame = open(tmp, 'r').readlines()
+    finally:
+        os.remove(tmp)
+
+    if not fame[0].startswith('Author'):
+        log('Errors occurred while getting authors:', level='ERROR')
+        errs = []
+        for ln in fame:
+            if ln.startswith('Author'):
+                break
+            errs.append(ln)
+        print_block('\n'.join(errs))
+        sys.exit(1)
+
+    log('Getting contributor names')
+    auths = []
+    for ln in fame[1:]:
+        ln = ln.strip()
+        if not ln:
+            break
+        t_auth = ln.split(',')[0]
+        if t_auth not in ('Douglas Daly',):
+            auths.append(t_auth)
+
+    with open('AUTHORS', 'r') as fin:
+        in_contents = fin.readlines()
+
+    out_contents = []
+    for ln in in_contents:
+        ln = ln.strip('\n')
+        if ln == 'Contributors:':
+            break
+        out_contents.append(ln)
+    out_contents.append('')
+
+    if auths:
+        out_contents.append('Contributors:\n')
+        for t_auth in auths:
+            out_contents.append('    - %s' % t_auth)
+
+    out_contents = '\n'.join(out_contents)
+    if draft:
+        log('Would generate AUTHORS:')
+        print_block(out_contents)
+    else:
+        with open('AUTHORS', 'w') as fout:
+            fout.write(out_contents)
+        log('Generated AUTHORS file')
+
+    run(ctx, 'git add AUTHORS', draft)
+    return
+
 
 @invoke.task
 def changelog(ctx, draft=False):
