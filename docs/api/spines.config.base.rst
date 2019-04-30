@@ -1,7 +1,7 @@
-spines.models.base
+spines.config.base
 ==================
 
-.. automodule:: spines.models.base
+.. automodule:: spines.config.base
     :members:
     :undoc-members:
     :show-inheritance:

@@ -12,6 +12,7 @@ spines.parameters
 
     spines.parameters.base
     spines.parameters.core
+    spines.parameters.decorators
     spines.parameters.factories
     spines.parameters.mixins
     spines.parameters.store

@@ -5,7 +5,8 @@ Mixin classes for Parameters.
 #
 #   Imports
 #
-from operator import gt, lt
+from operator import gt
+from operator import lt
 
 from .factories import bound_mixin
 
@@ -13,24 +14,6 @@ from .factories import bound_mixin
 #
 #   Mixins
 #
-
-class Minimum(bound_mixin('minimum', gt)):
-    """
-    Minimum value bound mixin class
-
-    Attributes
-    ----------
-    minimum
-        Minimum allowed value for this parameter.
-
-    Parameters
-    ----------
-    minimum : optional
-        Minimum allowed value for this parameter.
-
-    """
-    pass
-
 
 class Maximum(bound_mixin('maximum', lt)):
     """
@@ -45,6 +28,24 @@ class Maximum(bound_mixin('maximum', lt)):
     ----------
     maximum : optional
         Maximum allowed value for this parameter.
+
+    """
+    pass
+
+
+class Minimum(bound_mixin('minimum', gt)):
+    """
+    Minimum value bound mixin class
+
+    Attributes
+    ----------
+    minimum
+        Minimum allowed value for this parameter.
+
+    Parameters
+    ----------
+    minimum : optional
+        Minimum allowed value for this parameter.
 
     """
     pass

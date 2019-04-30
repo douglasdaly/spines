@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Decorators for Models
+Decorators for parameters module.
 """
 #
 #   Imports
@@ -8,22 +8,42 @@ Decorators for Models
 from functools import wraps
 from typing import Type
 
-from ..parameters.store import ParameterStore
-
 
 #
 #   Decorators
 #
 
-def finalize_pre(store: Type[ParameterStore], func):
+def state_changed(func):
+    """Decorator indicating a function which changes the state
+
+    Parameters
+    ----------
+    func : callable
+        The function to wrap.
+
+    Returns
+    -------
+    callable
+        The wrapped function.
+
+    """
+    @wraps(func)
+    def wrapped(self, *args, **kwargs):
+        ret = func(self, *args, **kwargs)
+        self._finalized = False
+        return ret
+    return wrapped
+
+
+def finalize_pre(func, store: Type['ParameterStore']):
     """Finalizes the store prior to executing the function
 
     Parameters
     ----------
-    store : ParameterStore
-        The parameter store to finalize.
     func : callable
         The function to wrap.
+    store : ParameterStore
+        The parameter store to finalize.
 
     Returns
     -------
@@ -45,15 +65,15 @@ def finalize_pre(store: Type[ParameterStore], func):
     return wrapper
 
 
-def finalize_post(store: Type[ParameterStore], func):
+def finalize_post(func, store: Type['ParameterStore']):
     """Finalizes the store prior to executing the function
 
     Parameters
     ----------
-    store : ParameterStore
-        The parameter store to finalize.
     func : callable
         The function to wrap.
+    store : ParameterStore
+        The parameter store to finalize.
 
     Returns
     -------

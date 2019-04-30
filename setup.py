@@ -44,6 +44,8 @@ setup(
     cmdclass=versioneer.get_cmdclass(),
     install_requires=[
         'parver',
+        'toml',
+        'xxhash',
     ],
     tests_require=[
         'pytest',
@@ -57,7 +59,6 @@ setup(
     keywords="spines parameterized models",
     classifiers=[
         'Development Status :: 2 - Pre-Alpha',
-        'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
         'Intended Audience :: Science/Research',

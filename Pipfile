@@ -7,6 +7,7 @@ verify_ssl = true
 spines = {editable = true,path = "."}
 coverage = "*"
 flake8 = "*"
+git-fame = "*"
 invoke = "*"
 ipykernel = "*"
 jupyter = "*"
@@ -15,13 +16,17 @@ pandoc = "*"
 parver = "*"
 pytest = "*"
 pytest-cov = "*"
+pytest-xdist = "*"
+python-dotenv = "*"
 sphinx = "*"
 sphinx-rtd-theme = "*"
+toml = "*"
 towncrier = "*"
 tox = "*"
 twine = "*"
 versioneer = "*"
 wheel = "*"
+xxhash = "*"
 
 [packages]
 

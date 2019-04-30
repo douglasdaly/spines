@@ -12,12 +12,17 @@ import datetime
 import glob
 import os
 import re
+import sys
+import tempfile
 
 import invoke
 
+from .helpers import VERSION
+from .helpers import ctx_run
 from .helpers import log as hlog
 from .helpers import print_block
-from .helpers import VERSION
+
+from .develop import todos
 
 
 #
@@ -26,6 +31,10 @@ from .helpers import VERSION
 
 def log(msg, level=None):
     hlog(msg, name='release', level=level)
+
+
+def run(ctx, cmd, draft):
+    return ctx_run(ctx, cmd, draft=draft, log_fn=log)
 
 
 def insert_text(original, new, after):
@@ -99,9 +108,70 @@ def changelog_rst_to_md(ctx, path):
 #
 
 @invoke.task
+def authors(ctx, draft=False, branch='master'):
+    """Generates the AUTHORS file"""
+    _, tmp = tempfile.mkstemp(suffix='.csv')
+    try:
+        log('Getting contributions')
+        ctx.run(f'git fame --log ERROR --branch {branch} --format csv > {tmp}')
+        fame = open(tmp, 'r').readlines()
+    finally:
+        os.remove(tmp)
+
+    if not fame[0].startswith('Author'):
+        log('Errors occurred while getting authors:', level='ERROR')
+        errs = []
+        for ln in fame:
+            if ln.startswith('Author'):
+                break
+            errs.append(ln)
+        print_block('\n'.join(errs))
+        sys.exit(1)
+
+    log('Getting contributor names')
+    auths = []
+    for ln in fame[1:]:
+        ln = ln.strip()
+        if not ln:
+            break
+        t_auth = ln.split(',')[0]
+        if t_auth not in ('Douglas Daly',):
+            auths.append(t_auth)
+
+    with open('AUTHORS', 'r') as fin:
+        in_contents = fin.readlines()
+
+    out_contents = []
+    for ln in in_contents:
+        ln = ln.strip('\n')
+        if ln == 'Contributors:':
+            break
+        out_contents.append(ln)
+    out_contents.append('')
+
+    if auths:
+        out_contents.append('Contributors:\n')
+        for t_auth in auths:
+            out_contents.append('    - %s' % t_auth)
+
+    out_contents = '\n'.join(out_contents)
+    if draft:
+        log('Would generate AUTHORS:')
+        print_block(out_contents)
+    else:
+        with open('AUTHORS', 'w') as fout:
+            fout.write(out_contents)
+        log('Generated AUTHORS file')
+
+    run(ctx, 'git add AUTHORS', draft)
+    return
+
+
+@invoke.task
 def changelog(ctx, draft=False):
     """Generates the CHANGELOG file"""
-    rel_ver = ctx.run('git rev-parse --abbrev-ref HEAD').stdout.strip()
+    todos(ctx, draft=draft)
+    rel_ver = ctx.run('git rev-parse --abbrev-ref HEAD', hide=True).stdout
     if rel_ver.startswith('release') or rel_ver.startswith('hotfix'):
         rel_ver = rel_ver.split('/')[-1].strip('v')
     else:
@@ -109,14 +179,11 @@ def changelog(ctx, draft=False):
 
     curr_md = open('CHANGELOG.md', 'r').read()
     if draft:
-        ctx.run(f"towncrier --draft --version {rel_ver} > CHANGELOG.draft.rst")
+        ctx.run(f"towncrier --draft --version {rel_ver} > CHANGELOG.draft.rst",
+                hide=True)
         log('Would clear changes/*')
         md_content = changelog_rst_to_md(ctx, 'CHANGELOG.draft.rst')
         new_md = insert_text(curr_md, md_content, "[//]: # (BEGIN)")
-        with open('CHANGELOG.draft.md', 'w') as fout:
-            fout.writelines(new_md)
-        log('Generated: CHANGELOG.draft.md')
-        ctx.run('git add CHANGELOG.draft.md')
         rst_content = open('CHANGELOG.draft.rst', 'r').read()
         os.remove('CHANGELOG.draft.rst')
         log('Would create new docs/changelog file:')
@@ -126,7 +193,7 @@ def changelog(ctx, draft=False):
         if os.path.exists('CHANGELOG.draft.md'):
             os.remove('CHANGELOG.draft.md')
             ctx.run('git add CHANGELOG.draft.md')
-        ctx.run(f'towncrier --version {rel_ver} --yes')
+        ctx.run(f'towncrier --yes --version {rel_ver}', hide=True)
         ctx.run('git add changes/')
         md_content = changelog_rst_to_md(ctx, 'CHANGELOG.rst')
         new_md = insert_text(curr_md, md_content, "[//]: # (BEGIN)")
@@ -140,4 +207,3 @@ def changelog(ctx, draft=False):
         ctx.run('git add %s' % doc_file)
 
     return
-

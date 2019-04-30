@@ -6,6 +6,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [//]: # (BEGIN)
 
+## \[0.0.6\] - 2019-04-29
+
+### Added
+
+- Add Transform class for data
+- Configuration object
+
+### Changed
+
+- Finalize Model method names
+- Refactor Model to extract file functions
+
+
 ## \[0.0.5\] - 2019-04-18
 
 ### Fixed

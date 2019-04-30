@@ -1,16 +1,33 @@
+#!make
+
 ###############################################################################
 # CONFIGURATION                                                               #
 ###############################################################################
-
-PROJECT_DIR := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
-
-PYTHON = python
-PKG_MGR = pipenv
 
 
 ###############################################################################
 # SETUP                                                                       #
 ###############################################################################
+
+-include .env
+
+PROJECT_DIR := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
+
+ifndef PYTHON
+	PYTHON = python
+endif
+
+ifndef PKG_MGR
+	PKG_MGR = pipenv
+endif
+
+ifndef TODO_CMD
+	TODO_CMD = todo
+endif
+
+ifndef PYTEST_CORES
+	PYTEST_CORES = auto
+endif
 
 SUBDIR_ROOTS := docs src tests
 DIRS := . $(shell find $(SUBDIR_ROOTS) -type d)
@@ -19,9 +36,9 @@ GARBAGE := $(foreach DIR,$(DIRS),$(addprefix $(DIR)/,$(GARBAGE_PATTERNS)))
 
 FLAKE8 = flake8
 INVOKE = invoke
+PYTEST = pytest
 TOX = tox
 TWINE = twine
-UNIT_TEST = pytest
 
 ifeq ($(PKG_MGR), pipenv)
     RUN_PRE = pipenv run
@@ -48,22 +65,22 @@ PYTHON := $(RUN_PRE) $(PYTHON)
 
 FLAKE8 := $(RUN_PRE) $(FLAKE8)
 INVOKE := $(RUN_PRE) $(INVOKE)
+PYTEST := $(RUN_PRE) $(PYTEST)
 TOX := $(RUN_PRE) $(TOX)
 TWINE := $(RUN_PRE) $(TWINE)
-UNIT_TEST := $(RUN_PRE) $(UNIT_TEST)
 
 ###############################################################################
 # COMMANDS                                                                    #
 ###############################################################################
 .PHONY: help setup teardown \
 		venv-create venv-remove \
-        requirements requirements-generate \
-        docs docs-clean \
+        requirements requirements-gen \
+        docs docs-clean docs-del-api docs-gen-api docs-gen-make \
         clean clean-build \
-		changelog changelog-draft \
+		changes changes-draft changelog changelog-draft \
 		ipykernel-install ipykernel-uninstall \
 		lint coverage \
-		test test-tox \
+		test test-watch test-tox \
 		build check-build release
 
 .DEFAULT-GOAL := help
@@ -72,7 +89,7 @@ help: ## Displays this help message
 	@printf 'Usage: make \033[36m[target]\033[0m\n'
 	@echo ''
 	@echo 'Available targets:'
-	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-30s\033[0m %s\n", $$1, $$2}'
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' Makefile | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-30s\033[0m %s\n", $$1, $$2}'
 	@echo ''
 
 setup: venv-create requirements ipykernel-install ## Sets up the environment for development
@@ -81,10 +98,10 @@ teardown: ipykernel-uninstall venv-remove ## Removes the environment for develop
 
 # Virtual environment
 
-venv-create: ## Creates the virtual environment for this project
+venv-create:
 	$(CREATE_VENV)
 
-venv-remove: ## Removes the virtual environment for this project
+venv-remove:
 	$(REMOVE_VENV)
 
 # Requirements
@@ -92,7 +109,7 @@ venv-remove: ## Removes the virtual environment for this project
 requirements: ## Installs Python dependencies
 	$(INSTALL_DEPENDENCIES)
 
-requirements-generate: ## Generates the project's requirements.txt file
+requirements-gen: ## Generates the project's requirements.txt file
 	$(GENERATE_DEPENDENCIES)
 
 # Documentation
@@ -103,8 +120,11 @@ docs: ## Generates the sphinx HTML documentation
 docs-clean: ## Cleans the generated documentation
 	@cd docs/ && $(RUN_PRE) make clean
 
-docs-apigen: ## Generates the API documentation files
+docs-gen-api: ## Generates the API documentation files
 	@cd docs/ && $(RUN_PRE) sphinx-apidoc -e -M -o api ../src/spines
+
+docs-gen-make: ## Generates the API documentation for this Makefile
+	$(INVOKE) docs.generate-make
 
 # Cleaning
 
@@ -112,10 +132,16 @@ clean: ## Delete all compiled Python files or temp files
 	@rm -rf $(GARBAGE)
 
 clean-build: ## Clean out the compiled package files
-	@rm -rf build/*.*
-	@rm -rf dist/*.*
+	@rm -rf build/*
+	@rm -rf dist/*
 
 # Changes
+
+changes: ## Generates the changes files from the todo files
+	$(INVOKE) develop.todos
+
+changes-draft: ## Genereates the draft changes from the todo files
+	$(INVOKE) develop.todos --draft
 
 changelog: ## Generates the new CHANGELOG.md file
 	$(INVOKE) release.changelog
@@ -137,15 +163,18 @@ lint: ## Lint using flake8
 	$(FLAKE8) src/spines/
 
 coverage: ## Runs code coverage checks over the codebase
-	$(UNIT_TEST) --cov=src/spines tests/
+	$(PYTEST) --cov=src/spines tests/
 
 # Unit testing
 
 test: ## Run the unit tests over the project
-	$(UNIT_TEST) tests/
+	$(PYTEST) tests/
 
 test-tox: ## Run the tox unit tests over the project
 	$(TOX)
+
+test-watch: ## Run pytest-watch to run tests on project changes
+	$(PYTEST) -f -n $(PYTEST_CORES) tests/
 
 # Distribution
 
