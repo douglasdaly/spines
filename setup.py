@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Setup file for the spines package.
+Setup file for Spines library.
 """
 #
 #   Imports
@@ -15,8 +15,7 @@ import versioneer
 #
 
 def read(file):
-    with open(file, encoding='utf-8') as fin:
-        return fin.read()
+    return open(file, encoding='utf-8').read()
 
 
 #
@@ -59,10 +58,10 @@ setup(
     keywords="spines parameterized models",
     classifiers=[
         'Development Status :: 2 - Pre-Alpha',
-        'Programming Language :: Python :: 3.6',
-        'Programming Language :: Python :: 3.7',
         'Intended Audience :: Science/Research',
         'Topic :: Scientific/Engineering',
+        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
         'License :: OSI Approved :: MIT License',
     ],
 )

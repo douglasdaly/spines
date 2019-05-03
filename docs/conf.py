@@ -12,18 +12,19 @@
 #
 import os
 import sys
-sys.path.insert(0, os.path.abspath('../src'))
 
-from spines import __version__
+# Modify the path so that the library can be accessed
+sys.path.insert(0, os.path.abspath('../src'))
+from spines import __version__ as VERSION
 
 
 # -- Project information -----------------------------------------------------
 
 project = 'Spines'
-copyright = '2017-2019, Douglas Daly'
+copyright = '2017-2019, <a href="https://www.douglasdaly.com/projects.html">Douglas Daly</a>'
 author = 'Douglas Daly'
 
-release = __version__.split('+')[0].strip()
+release = VERSION.split('+')[0].strip()
 version = '.'.join(release.split('.')[:2])
 
 # -- General configuration ---------------------------------------------------
@@ -36,6 +37,7 @@ extensions = [
     'sphinx.ext.autosummary',
     'sphinx.ext.intersphinx',
     'sphinx.ext.napoleon',
+    'sphinx.ext.todo',
     'sphinx.ext.viewcode',
     'nbsphinx',
 ]
@@ -63,11 +65,15 @@ html_theme_path = ["_themes", ]
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
 
+# Logo to show
+# html_logo = '_static/images/spines_logo_200.png'
+
+# Additional theme options
 html_theme_options = {
     'canonical_url': '',
     'display_version': True,
     'prev_next_buttons_location': 'bottom',
-    'style_external_links': False,
+    'style_external_links': True,
     #'style_nav_header_background': '#161616',
     # Toc options
     'collapse_navigation': True,
@@ -76,10 +82,6 @@ html_theme_options = {
 }
 
 
-# Add any paths that contain custom static files (such as style sheets) here,
-# relative to this directory. They are copied after the builtin static files,
-# so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_static']
+# -- Additional Plugin Options -----------------------------------------------
 
-# Additional options
-html_logo = '_static/images/spines_logo_200.png'
+todo_include_todos = True

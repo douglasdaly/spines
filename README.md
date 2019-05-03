@@ -1,7 +1,5 @@
 # Spines
 
-<img width="20%" align="right" src="./docs/_static/images/spines_logo_256.png" alt="Spines Logo" style="margin-left: 10px;">
-
 *Skeletons for parameterized models.*
 
 [![Build Status](https://travis-ci.org/douglasdaly/spines.svg?branch=master)](https://travis-ci.org/douglasdaly/spines)
@@ -10,6 +8,8 @@
 [![PyPI](https://img.shields.io/pypi/v/spines.svg)](https://pypi.org/project/spines/)
 [![Status](https://img.shields.io/pypi/status/spines.svg)](https://pypi.org/project/spines/)
 [![Python Versions](https://img.shields.io/pypi/pyversions/spines.svg)](https://pypi.org/project/spines/)
+
+<img width="20%" align="right" src="https://github.com/douglasdaly/spines/raw/master/docs/_static/images/spines_logo_256.png" alt="Spines Logo" style="margin-left: 10px;">
 
 **Important:** This software is still in it's early alpha phase and is 
 constantly in flux.  It will likely change significantly.

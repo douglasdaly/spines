@@ -2,6 +2,11 @@
 Spines
 ######
 
+.. image:: ./_static/images/spines_logo_256.png
+    :scale: 30 %
+    :alt: Spines Logo
+    :align: right
+
 *Skeletons for parameterized models.*
 
 |travis| |nbsp| |cov| |nbsp| |docs| |nbsp| |pypi| |nbsp| |status| |nbsp|
