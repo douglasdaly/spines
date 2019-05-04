@@ -123,8 +123,8 @@ def update_requirements(ctx):
         out = []
         for ln in contents:
             ln = ln.strip()
-            if ln.startswith('-e .') and '--no-use-pep517' not in ln:
-                ln = '%s %s' % (ln, '--no-use-pep517')
+            if '-e .' in ln and '--no-use-pep517' not in ln:
+                ln = '%s %s' % ('--no-use-pep517', ln)
             out.append(ln)
         with open(r_file, 'w') as fout:
             fout.write('\n'.join(out))
