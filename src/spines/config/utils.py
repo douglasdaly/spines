@@ -23,7 +23,7 @@ from .core import PluginConfig
 #   Constants
 #
 
-CONFIG_FILE = '.spinesrc'
+CONFIG_FILES = ('spines.toml', '.spines.toml')
 
 
 #
@@ -56,16 +56,20 @@ def find_config_files(path: str) -> List[str]:
     p = Path(path).resolve()
     usr_home = Path.home()
     while p != p.root:
-        q = p.joinpath(CONFIG_FILE)
-        if q.exists():
-            ret.append(str(q))
+        for cfg_name in CONFIG_FILES:
+            q = p.joinpath(cfg_name)
+            if q.exists():
+                ret.append(str(q))
+                break
         if p == usr_home or p.joinpath(PROJECT_DIRNAME).exists():
             break
         p = p.parent
     if p != usr_home:
-        q = usr_home.joinpath(CONFIG_FILE)
-        if q.exists():
-            ret.append(str(q))
+        for cfg_name in CONFIG_FILES:
+            q = usr_home.joinpath(cfg_name)
+            if q.exists():
+                ret.append(str(q))
+                break
     return reversed(ret)
 
 

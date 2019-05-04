@@ -8,15 +8,12 @@ Base classes for the spines versioning functionality.
 from abc import ABC
 from abc import abstractmethod
 from hashlib import blake2s
-from typing import Dict
-from typing import Tuple
 from typing import Type
 
 import parver
 from xxhash import xxh64
 
 from .. import __version__
-from ..parameters.base import Parameter
 from .utils import get_doc_string
 from .utils import slugify
 
@@ -70,16 +67,19 @@ class BaseSignature(ABC):
         """str: The name of the object this signature is for"""
         return self._name
 
-    @classmethod
-    def _get_hash(cls, obj) -> [bytes, None]:
+    @property
+    def slug(self) -> str:
+        """str: Slug-ified version of this signature"""
+        return "%s@%s" % (slugify(self.name), self.hash)
+
+    def _get_hash(self, obj) -> [bytes, None]:
         """Gets the hash for the given object"""
-        m = cls._HASH()
-        m.update(cls._get_bytes(obj))
+        m = self._HASH()
+        m.update(self._get_bytes(obj))
         return m
 
-    @classmethod
     @abstractmethod
-    def _get_bytes(cls, obj) -> bytes:
+    def _get_bytes(self, obj) -> bytes:
         """Gets the relevant bytes for a single object"""
         pass
 
@@ -97,27 +97,20 @@ class BaseVersion(BaseSignature):
     _HASH = blake2s
 
     def __init__(self, obj) -> None:
-        if not isinstance(obj, type):
-            obj = obj.__class__
         self._spines_version = __version__
         self._desc = self._get_desc(obj)
 
-        super(BaseVersion, self).__init__(obj)
+        super().__init__(obj)
 
-        self._version = self._determine_next_version(
+        self._version = self._get_next_version(
             obj.__getattribute__('__version__', None)
         )
         return
 
     def __repr__(self) -> str:
-        return '<Version: name="%s" version="%s">' % (
-            self.name, self.version
+        return '<%s: name="%s" version="%s">' % (
+            self.__class__.__name__, self.name, self.version
         )
-
-    @property
-    def name(self) -> str:
-        """str: Name of the object versioned."""
-        return self._name
 
     @property
     def description(self) -> str:
@@ -142,8 +135,6 @@ class BaseVersion(BaseSignature):
         """str: Version string for this version object."""
         return str(self._version)
 
-    # Version switches
-
     def to_release(self) -> None:
         """Switches the version to release"""
         self._version = self._version.clear(dev=False, pre=False, post=False)
@@ -164,8 +155,6 @@ class BaseVersion(BaseSignature):
         self._version = self._version.clear(dev=True)
         return
 
-    # Versioning logic
-
     @abstractmethod
     def _get_next_version(
         self,
@@ -174,24 +163,7 @@ class BaseVersion(BaseSignature):
         """Determines the next version from the previous"""
         pass
 
-    # Helper methods
-
-    @classmethod
-    def _get_desc(cls, obj) -> [str, None]:
+    def _get_desc(self, obj) -> [str, None]:
         """Helper function to get description of this versioned object
         """
         return get_doc_string(obj)
-
-    @classmethod
-    def _get_signatures_helper(
-        cls, obj, signature_cls: type, *allowed_types: Tuple[type]
-    ) -> Tuple[Dict[str, Type[Parameter]], Dict[str, Type['Signature']]]:
-        """Helper function to get individual model parameters"""
-        if not allowed_types:
-            allowed_types = object
-        ret, sigs = {}, {}
-        for k, v in obj.__dict__.items():
-            if isinstance(v, allowed_types):
-                ret[k] = v
-                sigs[k] = signature_cls(v)
-        return ret, sigs

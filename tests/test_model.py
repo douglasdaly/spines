@@ -64,7 +64,7 @@ class TestFileFunctions(object):
     @staticmethod
     def _model_file_function(model, fmt):
         """Tests the load/save capabilities of the Model class"""
-        file_ext = utils.file.get_archive_extension(fmt)
+        file_ext = utils.files.get_archive_extension(fmt)
         for new in [False, True]:
             tmp = tempfile.mktemp(suffix=file_ext)
             try:

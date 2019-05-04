@@ -29,5 +29,5 @@ def override(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
         return func(*args, **kwargs)
-    wrapper.__is_overridden = True
+    wrapper.__overridden__ = True
     return wrapper

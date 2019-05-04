@@ -12,12 +12,12 @@ from typing import Type
 
 from ..parameters.base import Parameter
 from ..parameters.store import ParameterStore
-from ..utils.file import extract_archive
-from ..utils.file import save_archive
-from ..utils.file import save_pickle
-from ..utils.file import load_pickle
+from ..utils.files import extract_archive
+from ..utils.files import save_archive
+from ..utils.files import save_pickle
+from ..utils.files import load_pickle
+from ..utils.objects import get_overridden_methods
 from .decorators import override
-from .utils import get_overridden_methods
 
 
 #

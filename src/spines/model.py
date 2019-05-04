@@ -16,8 +16,8 @@ from .parameters.decorators import finalize_post
 from .parameters.decorators import finalize_pre
 from .parameters.store import ParameterStore
 from .transforms.base import Transform
-from .utils.file import load_pickle
-from .utils.file import save_pickle
+from .utils.files import load_pickle
+from .utils.files import save_pickle
 
 
 #
@@ -259,11 +259,11 @@ class Model(Transform):
         self.fit = finalize_pre(self.fit, self._hyper_params)
         self.fit = finalize_post(self.fit, self._params)
 
-        if (hasattr(self.error, '__is_overridden')
-                and not hasattr(self.score, '__is_overridden')):
+        if (hasattr(self.error, '__overridden__')
+                and not hasattr(self.score, '__overridden__')):
             self.score = negate(self.error)
-        elif (hasattr(self.score, '__is_overridden')
-                and not hasattr(self.error, '__is_overridden')):
+        elif (hasattr(self.score, '__overridden__')
+                and not hasattr(self.error, '__overridden__')):
             self.error = negate(self.score)
 
         return
