@@ -47,7 +47,8 @@ ifeq ($(PKG_MGR), pipenv)
 	CREATE_VENV =
 	REMOVE_VENV = pipenv --rm
     INSTALL_DEPENDENCIES = pipenv install --dev
-    GENERATE_DEPENDENCIES = pipenv lock --dev -r > requirements.txt
+    GENERATE_DEPENDENCIES = pipenv lock -r
+	GENERATE_DEPENDENCIES_DEV := $(GENERATE_DEPENDENCIES) --dev
 else
     RUN_PRE =
 	VENV_DIR = env
@@ -55,7 +56,8 @@ else
 	CREATE_VENV := virtualenv $(VENV_DIR)/
 	REMOVE_VENV := rm -rf $(VENV_DIR)
     INSTALL_DEPENDENCIES = pip install -r requirements.txt
-    GENERATE_DEPENDENCIES = pip freeze --local > requirements.txt
+    GENERATE_DEPENDENCIES = pip freeze --local
+	GENERATE_DEPENDENCIES_DEV := $(GENERATE_DEPENDENCIES)
 endif
 
 ACTIVATE_VENV := source $(VENV_DIR)/bin/activate
@@ -74,8 +76,8 @@ TWINE := $(RUN_PRE) $(TWINE)
 ###############################################################################
 .PHONY: help setup teardown \
 		venv-create venv-remove \
-        requirements requirements-gen \
-        docs docs-clean docs-del-api docs-gen-api docs-gen-make \
+        requirements generate-requirements \
+        docs docs-clean generate-docs-api generate-docs-make \
         clean clean-build \
 		changes changes-draft changelog changelog-draft \
 		ipykernel-install ipykernel-uninstall \
@@ -107,10 +109,12 @@ venv-remove:
 # Requirements
 
 requirements: ## Installs Python dependencies
-	$(INSTALL_DEPENDENCIES)
+	(export PIP_USE_PEP517=false; $(INSTALL_DEPENDENCIES))
 
-requirements-gen: ## Generates the project's requirements.txt file
-	$(GENERATE_DEPENDENCIES)
+generate-requirements: ## Generates the project's requirements.txt files
+	$(GENERATE_DEPENDENCIES) > requirements.txt
+	$(GENERATE_DEPENDENCIES_DEV) > requirements-dev.txt
+	$(INVOKE) develop.update-requirements
 
 # Documentation
 
@@ -120,10 +124,10 @@ docs: ## Generates the sphinx HTML documentation
 docs-clean: ## Cleans the generated documentation
 	@cd docs/ && $(RUN_PRE) make clean
 
-docs-gen-api: ## Generates the API documentation files
+generate-docs-api: ## Generates the API documentation files
 	@cd docs/ && $(RUN_PRE) sphinx-apidoc -e -M -o api ../src/spines
 
-docs-gen-make: ## Generates the API documentation for this Makefile
+generate-docs-make: ## Generates the API documentation for this Makefile
 	$(INVOKE) docs.generate-make
 
 # Cleaning

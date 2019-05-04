@@ -3,8 +3,13 @@ name = "pypi"
 url = "https://pypi.org/simple"
 verify_ssl = true
 
+[packages]
+spines = {path = ".",editable = true}
+parver = "*"
+toml = "*"
+xxhash = "*"
+
 [dev-packages]
-spines = {editable = true,path = "."}
 coverage = "*"
 flake8 = "*"
 git-fame = "*"
@@ -14,22 +19,16 @@ jupyter = "*"
 mypy = "*"
 nbsphinx = "*"
 pandoc = "*"
-parver = "*"
 pytest = "*"
 pytest-cov = "*"
 pytest-xdist = "*"
 python-dotenv = "*"
 sphinx = "*"
 sphinx-rtd-theme = "*"
-toml = "*"
 towncrier = "*"
 tox = "*"
 twine = "*"
 versioneer = "*"
-wheel = "*"
-xxhash = "*"
-
-[packages]
 
 [requires]
 python_version = "3.7"
