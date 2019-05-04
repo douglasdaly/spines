@@ -17,6 +17,7 @@ from xxhash import xxh64
 
 from .. import __version__
 from ..parameters.base import Parameter
+from .utils import get_doc_string
 from .utils import slugify
 
 
@@ -37,8 +38,6 @@ class BaseSignature(ABC):
     _HASH = xxh64
 
     def __init__(self, obj):
-        if not isinstance(obj, type):
-            obj = obj.__class__
         self._name = obj.__name__
         self._hash = self._get_hash(obj).digest()
 
@@ -46,9 +45,15 @@ class BaseSignature(ABC):
         return '%s @ %s' % (self.name, self.hash[-8:])
 
     def __repr__(self):
-        return '<Signature: name="%s" hash="%s">' % (
-            self.name, self.hash[-8:]
+        return '<%s: name="%s" hash="%s">' % (
+            self.__class__.__name__, self.name, self.hash[-8:]
         )
+
+    def __eq__(self, value: Type['BaseSignature']) -> bool:
+        return self.hash_bytes == value.hash_bytes
+
+    def __ne__(self, value: Type['BaseSignature']) -> bool:
+        return not self.__eq__(value)
 
     @property
     def hash(self) -> str:
@@ -72,8 +77,8 @@ class BaseSignature(ABC):
         m.update(cls._get_bytes(obj))
         return m
 
-    @abstractmethod
     @classmethod
+    @abstractmethod
     def _get_bytes(cls, obj) -> bytes:
         """Gets the relevant bytes for a single object"""
         pass
@@ -91,7 +96,7 @@ class BaseVersion(BaseSignature):
     """
     _HASH = blake2s
 
-    def __init__(self, obj):
+    def __init__(self, obj) -> None:
         if not isinstance(obj, type):
             obj = obj.__class__
         self._spines_version = __version__
@@ -102,8 +107,9 @@ class BaseVersion(BaseSignature):
         self._version = self._determine_next_version(
             obj.__getattribute__('__version__', None)
         )
+        return
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return '<Version: name="%s" version="%s">' % (
             self.name, self.version
         )
@@ -115,7 +121,7 @@ class BaseVersion(BaseSignature):
 
     @property
     def description(self) -> str:
-        """str: Docstring for the main object versioned."""
+        """str: Description for the main object versioned."""
         return self._desc
 
     @property
@@ -160,14 +166,13 @@ class BaseVersion(BaseSignature):
 
     # Versioning logic
 
+    @abstractmethod
     def _get_next_version(
         self,
         prev_version: [Type['Version'], None]
     ) -> Type[parver.Version]:
         """Determines the next version from the previous"""
-        if prev_version is None:
-            return parver.Version((0, 0, 1), dev=None)
-        return
+        pass
 
     # Helper methods
 
@@ -175,7 +180,7 @@ class BaseVersion(BaseSignature):
     def _get_desc(cls, obj) -> [str, None]:
         """Helper function to get description of this versioned object
         """
-        return getattr(obj, '__doc__', None)
+        return get_doc_string(obj)
 
     @classmethod
     def _get_signatures_helper(

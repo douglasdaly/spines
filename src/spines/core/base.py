@@ -31,17 +31,17 @@ class BaseObject(ABC):
     __version__ = None
     __param_store__ = ParameterStore
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         self._params = self._create_store(
             self.__param_store__, Parameter
         )
         self._modify_methods()
         return
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.__class__.__name__
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return '<%s version="%s" parameters="%s">' % (
             self.__class__.__name__, self.__version__,
             ', '.join(sorted(self.parameters.keys()))

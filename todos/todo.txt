@@ -1,4 +1,3 @@
-(B) Implement Signature class +add
 (B) Versioning object for models +change
 (C) Implement default file path for Model +add
 (C) Iteratively get dependent funcs in Version +change

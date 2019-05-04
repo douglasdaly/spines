@@ -5,6 +5,7 @@ verify_ssl = true
 
 [packages]
 spines = {path = ".",editable = true}
+click = "*"
 parver = "*"
 toml = "*"
 xxhash = "*"

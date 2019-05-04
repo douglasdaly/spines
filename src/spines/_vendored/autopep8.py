@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
 
+# Vendored version modified from autopep8:
+#   https://github.com/hhatto/autopep8
+# See that project's LICENSE file: autopep8.LICENSE
+
 # Copyright (C) 2010-2011 Hideo Hattori
 # Copyright (C) 2011-2013 Hideo Hattori, Steven Myint
 # Copyright (C) 2013-2016 Hideo Hattori, Steven Myint, Bill Wendling
@@ -58,7 +62,7 @@ import token
 import tokenize
 import ast
 
-import pycodestyle
+from . import pycodestyle as _v_pycodestyle
 
 
 try:
@@ -183,9 +187,9 @@ def extended_blank_lines(logical_line,
                          previous_logical):
     """Check for missing blank lines after class declaration."""
     if previous_logical.startswith('def '):
-        if blank_lines and pycodestyle.DOCSTRING_REGEX.match(logical_line):
+        if blank_lines and _v_pycodestyle.DOCSTRING_REGEX.match(logical_line):
             yield (0, 'E303 too many blank lines ({})'.format(blank_lines))
-    elif pycodestyle.DOCSTRING_REGEX.match(previous_logical):
+    elif _v_pycodestyle.DOCSTRING_REGEX.match(previous_logical):
         # Missing blank line between class docstring and method declaration.
         if (
             indent_level and
@@ -197,7 +201,7 @@ def extended_blank_lines(logical_line,
             yield (0, 'E301 expected 1 blank line, found 0')
 
 
-pycodestyle.register_check(extended_blank_lines)
+_v_pycodestyle.register_check(extended_blank_lines)
 
 
 def continued_indentation(logical_line, tokens, indent_level, hang_closing,
@@ -255,7 +259,7 @@ def continued_indentation(logical_line, tokens, indent_level, hang_closing,
             last_indent = start
 
             # Record the initial indent.
-            rel_indent[row] = pycodestyle.expand_indent(line) - indent_level
+            rel_indent[row] = _v_pycodestyle.expand_indent(line) - indent_level
 
             # Identify closing bracket.
             close_bracket = (token_type == tokenize.OP and text in ']})')
@@ -380,7 +384,8 @@ def continued_indentation(logical_line, tokens, indent_level, hang_closing,
     if (
         indent_next and
         not last_line_begins_with_multiline and
-        pycodestyle.expand_indent(line) == indent_level + DEFAULT_INDENT_SIZE
+        _v_pycodestyle.expand_indent(line) == indent_level
+            + DEFAULT_INDENT_SIZE
     ):
         pos = (start[0], indent[0] + 4)
         desired_indent = indent_level + 2 * DEFAULT_INDENT_SIZE
@@ -390,8 +395,10 @@ def continued_indentation(logical_line, tokens, indent_level, hang_closing,
             yield (pos, 'E125 {}'.format(desired_indent))
 
 
-del pycodestyle._checks['logical_line'][pycodestyle.continued_indentation]
-pycodestyle.register_check(continued_indentation)
+del _v_pycodestyle._checks['logical_line'][
+    _v_pycodestyle.continued_indentation
+]
+_v_pycodestyle.register_check(continued_indentation)
 
 
 class FixPEP8(object):
@@ -717,7 +724,7 @@ class FixPEP8(object):
             if not check_syntax(fixed.lstrip()):
                 return
             errors = list(
-                pycodestyle.missing_whitespace_around_operator(fixed, ts))
+                _v_pycodestyle.missing_whitespace_around_operator(fixed, ts))
             for e in reversed(errors):
                 if error_code != e[1].split()[0]:
                     continue
@@ -1441,7 +1448,7 @@ def get_module_imports_on_top_of_file(source, import_line_index):
             if cnt == import_line_index or is_future_import(line):
                 continue
             return cnt
-        elif pycodestyle.DUNDER_REGEX.match(line):
+        elif _v_pycodestyle.DUNDER_REGEX.match(line):
             continue
         elif any(line.startswith(kw) for kw in allowed_try_keywords):
             continue
@@ -1655,7 +1662,7 @@ def fix_e265(source, aggressive=False):  # pylint: disable=unused-argument
         if (
             line.lstrip().startswith('#') and
             line_number not in ignored_line_numbers and
-            not pycodestyle.noqa(line)
+            not _v_pycodestyle.noqa(line)
         ):
             indentation = _get_indentation(line)
             line = line.lstrip()
@@ -2904,7 +2911,7 @@ def fix_whitespace(line, offset, replacement):
 
 def _execute_pep8(pep8_options, source):
     """Execute pycodestyle via python method calls."""
-    class QuietReport(pycodestyle.BaseReport):
+    class QuietReport(_v_pycodestyle.BaseReport):
 
         """Version of checker that does not print."""
 
@@ -2934,8 +2941,8 @@ def _execute_pep8(pep8_options, source):
             """
             return self.__full_error_results
 
-    checker = pycodestyle.Checker('', lines=source, reporter=QuietReport,
-                                  **pep8_options)
+    checker = _v_pycodestyle.Checker('', lines=source, reporter=QuietReport,
+                                     **pep8_options)
     checker.check_all()
     return checker.report.full_error_results()
 
@@ -3558,7 +3565,7 @@ def extract_code_from_function(function):
 
 
 def _get_package_version():
-    packages = ["pycodestyle: {}".format(pycodestyle.__version__)]
+    packages = ["pycodestyle: {}".format(_v_pycodestyle.__version__)]
     return ", ".join(packages)
 
 

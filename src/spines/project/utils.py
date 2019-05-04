@@ -7,3 +7,9 @@ Utilities for the projects subpackage.
 #
 
 PROJECT_DIRNAME = '.spines'
+
+
+#
+#   Functions
+#
+
