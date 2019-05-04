@@ -114,7 +114,7 @@ requirements: ## Installs Python dependencies
 generate-requirements: ## Generates the project's requirements.txt files
 	$(GENERATE_DEPENDENCIES) > requirements.txt
 	$(GENERATE_DEPENDENCIES_DEV) > requirements-dev.txt
-	$(INVOKE) develop.update-requirements
+	#$(INVOKE) develop.update-requirements
 
 # Documentation
 

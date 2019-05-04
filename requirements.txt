@@ -1,5 +1,5 @@
 -i https://pypi.org/simple
---no-use-pep517 -e .
+-e .
 arpeggio==1.9.0
 attrs==19.1.0
 parver==0.2.1
