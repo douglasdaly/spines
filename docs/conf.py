@@ -21,7 +21,7 @@ from spines import __version__ as VERSION
 # -- Project information -----------------------------------------------------
 
 project = 'Spines'
-copyright = '2017-2019, <a href="https://www.douglasdaly.com/projects.html">Douglas Daly</a>'
+copyright = '2017-2019, Douglas Daly'
 author = 'Douglas Daly'
 
 release = VERSION.split('+')[0].strip()
@@ -73,7 +73,7 @@ html_theme_options = {
     'canonical_url': '',
     'display_version': True,
     'prev_next_buttons_location': 'bottom',
-    'style_external_links': True,
+    'style_external_links': False,
     #'style_nav_header_background': '#161616',
     # Toc options
     'collapse_navigation': True,

@@ -79,7 +79,7 @@ TWINE := $(RUN_PRE) $(TWINE)
         requirements generate-requirements \
         docs docs-clean generate-docs-api generate-docs-make \
         clean clean-build \
-		changes changes-draft changelog changelog-draft \
+		authors authors-draft changes changes-draft changelog changelog-draft \
 		ipykernel-install ipykernel-uninstall \
 		lint coverage \
 		test test-watch test-tox \
@@ -114,7 +114,6 @@ requirements: ## Installs Python dependencies
 generate-requirements: ## Generates the project's requirements.txt files
 	$(GENERATE_DEPENDENCIES) > requirements.txt
 	$(GENERATE_DEPENDENCIES_DEV) > requirements-dev.txt
-	#$(INVOKE) develop.update-requirements
 
 # Documentation
 
@@ -141,17 +140,23 @@ clean-build: ## Clean out the compiled package files
 
 # Changes
 
+authors: ## Generates the AUTHORS file
+	$(INVOKE) generate.authors
+
+authors-draft: ## Generates the draft AUTHORS file
+	$(INVOKE) generate.authors --draft
+
 changes: ## Generates the changes files from the todo files
-	$(INVOKE) develop.todos
+	$(INVOKE) generate.todos
 
 changes-draft: ## Genereates the draft changes from the todo files
-	$(INVOKE) develop.todos --draft
+	$(INVOKE) generate.todos --draft
 
 changelog: ## Generates the new CHANGELOG.md file
-	$(INVOKE) release.changelog
+	$(INVOKE) generate.changelog
 
 changelog-draft: ## Generates the draft new CHANGELOG.draft.md file
-	$(INVOKE) release.changelog --draft
+	$(INVOKE) generate.changelog --draft
 
 # IPyKernel
 
@@ -179,6 +184,9 @@ test-tox: ## Run the tox unit tests over the project
 
 test-watch: ## Run pytest-watch to run tests on project changes
 	$(PYTEST) -f -n $(PYTEST_CORES) tests/
+
+tox-rebuild: ## Rebuilds the tox environments
+	$(TOX) --recreate --notest
 
 # Distribution
 
