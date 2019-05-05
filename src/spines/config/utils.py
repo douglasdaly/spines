@@ -14,16 +14,10 @@ from typing import Type
 
 import toml
 
-from ..project.utils import PROJECT_DIRNAME
+from ..project.settings import PROJECT_DIRNAME
 from .core import Config
 from .core import PluginConfig
-
-
-#
-#   Constants
-#
-
-CONFIG_FILES = ('spines.toml', '.spines.toml')
+from .settings import CONFIG_FILES
 
 
 #

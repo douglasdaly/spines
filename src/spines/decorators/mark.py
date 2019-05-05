@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Decorators for the spines core subpackage.
+Decorators related to marking objects and their attributes.
 """
 #
 #   Imports

@@ -10,14 +10,15 @@ from typing import Dict
 from typing import List
 from typing import Type
 
-from .decorators import negate
-from .parameters.base import HyperParameter
-from .parameters.decorators import finalize_post
-from .parameters.decorators import finalize_pre
-from .parameters.store import ParameterStore
-from .transforms.base import Transform
-from .utils.files import load_pickle
-from .utils.files import save_pickle
+from ..core.base import BaseObjectException
+from ..decorators.output import negate
+from ..utils.file import load_pickle
+from ..utils.file import save_pickle
+from ..parameters.base import HyperParameter
+from ..parameters.decorators import finalize_post
+from ..parameters.decorators import finalize_pre
+from ..parameters.store import ParameterStore
+from ..transforms.base import Transform
 
 
 #
@@ -267,3 +268,14 @@ class Model(Transform):
             self.error = negate(self.score)
 
         return
+
+
+#
+#   Exceptions
+#
+
+class ModelException(BaseObjectException):
+    """
+    Base class for Model exceptions.
+    """
+    pass

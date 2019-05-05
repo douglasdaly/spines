@@ -1,4 +1,4 @@
 # -*- coding: utf-8 -*-
 """
-Vendored libraries for spines.
+Vendored library versions used by spines.
 """

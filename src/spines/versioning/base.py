@@ -7,35 +7,38 @@ Base classes for the spines versioning functionality.
 #
 from abc import ABC
 from abc import abstractmethod
-from hashlib import blake2s
+from sys import maxsize as _OS_MAXSIZE
 from typing import Type
 
-import parver
-from xxhash import xxh64
+if _OS_MAXSIZE > 2**32:
+    from xxhash import xxh64 as xxh
+else:
+    from xxhash import xxh32 as xxh
 
-from .. import __version__
-from .utils import get_doc_string
-from .utils import slugify
+from ..utils.string import slugify
 
 
 #
-#   Classes
+#   Base class
 #
 
-class BaseSignature(ABC):
+class Signature(ABC):
     """
-    Base signature objects for component change tracking and management.
+    Signature objects for component change tracking and management.
 
     This object is used for tagging/version-tracking a single component
     of a larger model (e.g. the ``fit`` method).  Collections of these
-    objects are used to identify, fully, a particular version of a
+    objects are used to identify, for example, a particular version of a
     :class:`Model` instance.
 
     """
-    _HASH = xxh64
+    _HASH = xxh
 
-    def __init__(self, obj):
-        self._name = obj.__name__
+    def __init__(self, obj: [type, object], name: str = None):
+        if not name:
+            self._name = obj.__name__
+        else:
+            self._name = name
         self._hash = self._get_hash(obj).digest()
 
     def __str__(self):
@@ -46,10 +49,10 @@ class BaseSignature(ABC):
             self.__class__.__name__, self.name, self.hash[-8:]
         )
 
-    def __eq__(self, value: Type['BaseSignature']) -> bool:
+    def __eq__(self, value: Type['Signature']) -> bool:
         return self.hash_bytes == value.hash_bytes
 
-    def __ne__(self, value: Type['BaseSignature']) -> bool:
+    def __ne__(self, value: Type['Signature']) -> bool:
         return not self.__eq__(value)
 
     @property
@@ -82,88 +85,3 @@ class BaseSignature(ABC):
     def _get_bytes(self, obj) -> bytes:
         """Gets the relevant bytes for a single object"""
         pass
-
-
-class BaseVersion(BaseSignature):
-    """
-    Base version object for versioning module.
-
-    Parameters
-    ----------
-    obj : object
-        The object to generate a version object for.
-
-    """
-    _HASH = blake2s
-
-    def __init__(self, obj) -> None:
-        self._spines_version = __version__
-        self._desc = self._get_desc(obj)
-
-        super().__init__(obj)
-
-        self._version = self._get_next_version(
-            obj.__getattribute__('__version__', None)
-        )
-        return
-
-    def __repr__(self) -> str:
-        return '<%s: name="%s" version="%s">' % (
-            self.__class__.__name__, self.name, self.version
-        )
-
-    @property
-    def description(self) -> str:
-        """str: Description for the main object versioned."""
-        return self._desc
-
-    @property
-    def slug(self) -> str:
-        """str: Slugified version of this version object"""
-        slug_name = slugify(self._name)
-        slug_vers = slugify(str(self._version))
-        return '%s/%s' % (slug_name, slug_vers)
-
-    @property
-    def spines_version(self) -> str:
-        """str: Version of spines this version object was created with
-        """
-        return self._spines_version
-
-    @property
-    def version(self) -> str:
-        """str: Version string for this version object."""
-        return str(self._version)
-
-    def to_release(self) -> None:
-        """Switches the version to release"""
-        self._version = self._version.clear(dev=False, pre=False, post=False)
-        return
-
-    def to_pre(self) -> None:
-        """Switches the version to pre-release"""
-        self._version = self._version.clear(pre=True)
-        return
-
-    def to_post(self) -> None:
-        """Switches the version to post-release"""
-        self._version = self._version.clear(post=True)
-        return
-
-    def to_dev(self) -> None:
-        """Switches the version to development"""
-        self._version = self._version.clear(dev=True)
-        return
-
-    @abstractmethod
-    def _get_next_version(
-        self,
-        prev_version: [Type['Version'], None]
-    ) -> Type[parver.Version]:
-        """Determines the next version from the previous"""
-        pass
-
-    def _get_desc(self, obj) -> [str, None]:
-        """Helper function to get description of this versioned object
-        """
-        return get_doc_string(obj)

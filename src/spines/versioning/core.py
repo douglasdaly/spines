@@ -8,32 +8,34 @@ Core classes for the spines versioning subpackage.
 from types import FunctionType
 from typing import Any
 from typing import Dict
-from typing import OrderedDict as T_OrderedDict
 from typing import Tuple
 from typing import Type
 
-from ..core.base import BaseObject
-from ..parameters.base import HyperParameter
-from ..parameters.base import Parameter
-from ..utils.objects import get_matching_attributes
-from ..utils.objects import get_overridden_methods
-from .base import BaseSignature
-from .base import BaseVersion
-from .utils import get_function_bytes
-from .utils import get_function_spec
+try:
+    from typing import OrderedDict as T_OrderedDict
+except ImportError:
+    T_OrderedDict = Dict
+
+from ..utils.function import get_hash_bytes
+from ..utils.function import get_specification
+from ..utils.object import get_new_functions
+from ..utils.object import get_new_properties
+from ..utils.object import get_overridden_functions
+from ..utils.object import get_overridden_properties
+from .base import Signature
 
 
 #
 #   Classes
 #
 
-class FunctionSignature(BaseSignature):
+class FunctionSignature(Signature):
     """
     Signature class for versioning individual functions.
     """
 
     def __init__(self, obj: FunctionType) -> None:
-        self._fn_argspecs, self._fn_rtype = get_function_spec(obj)
+        self._fn_argspecs, self._fn_rtype = get_specification(obj)
         return super().__init__(obj)
 
     @property
@@ -96,24 +98,94 @@ class FunctionSignature(BaseSignature):
 
     def _get_bytes(self, obj: FunctionType) -> bytes:
         """Gets the bytes to hash for a Function"""
-        return get_function_bytes(obj)
+        return get_hash_bytes(obj)
 
 
-class ClassSignature(BaseSignature):
+class PropertySignature(Signature):
     """
-    Signature object for classes
+    Signature for properties
+    """
+    __function_signature__ = FunctionSignature
+
+    def __init__(self, obj: property, name: str) -> None:
+        self._fdel = self._get_property_function(obj, 'fdel')
+        self._fget = self._get_property_function(obj, 'fget')
+        self._fset = self._get_property_function(obj, 'fset')
+        return super().__init__(obj, name)
+
+    @property
+    def getter(self) -> [Type[FunctionSignature], None]:
+        """FunctionSignature: Signature for this property's fget"""
+        return self._fget
+
+    @property
+    def setter(self) -> [Type[FunctionSignature], None]:
+        """FunctionSignature: Signature for this property's fset"""
+        return self._fset
+
+    @property
+    def deleter(self) -> [Type[FunctionSignature], None]:
+        """FunctionSignature: Signature for this property's fdel"""
+        return self._fdel
+
+    @classmethod
+    def _get_property_function(
+        cls,
+        obj: [type, object],
+        method: str
+    ) -> [Type[FunctionSignature], None]:
+        """Helper function to get property's various methods"""
+        meth = getattr(obj, method)
+        if meth is None:
+            return None
+        return cls.__function_signature__(meth)
+
+    def _get_bytes(self, obj: [type, object]) -> bytes:
+        """Gets the hash bytes for the property"""
+        ret = self._name.encode()
+        if self._fget:
+            ret += self._fget.hash_bytes
+        if self._fset:
+            ret += self._fset.hash_bytes
+        if self._fdel:
+            ret += self._fdel.hash_bytes
+        return ret
+
+
+class ClassSignature(Signature):
+    """
+    Signature for classes
     """
     __base_cls__ = object
+    __function_signature__ = FunctionSignature
+    __property_signature__ = PropertySignature
 
-    def __init__(self, obj):
+    def __init__(self, obj: [type, object]) -> None:
         if not isinstance(obj, type):
             obj = obj.__class__
         self._functions = self._get_functions(obj)
+        self._properties = self._get_properties(obj)
         return super().__init__(obj)
+
+    @property
+    def functions(self) -> Dict[str, Type[FunctionSignature]]:
+        """dict: Function names and signatures for this class"""
+        return self._functions.copy()
+
+    @property
+    def properties(self) -> Dict[str, Type[PropertySignature]]:
+        """dict: Properties and their signatures for this class"""
+        return self._properties.copy()
 
     def _get_bytes(self, obj: Type[__base_cls__]) -> bytes:
         """Gets the bytes relevant to the hash function"""
         ret = None
+        for prop in sorted(self._properties.keys()):
+            t_bytes = self._properties[prop].hash_bytes
+            if ret is None:
+                ret = t_bytes
+            else:
+                ret += t_bytes
         for fn in sorted(self._functions.keys()):
             t_bytes = self._functions[fn].hash_bytes
             if ret is None:
@@ -123,45 +195,23 @@ class ClassSignature(BaseSignature):
         return ret
 
     @classmethod
-    def _get_functions(cls, obj: type) -> Dict[str, Type[BaseSignature]]:
+    def _get_functions(cls, obj: type) -> Dict[str, Type[FunctionSignature]]:
         """Gets the relevant functions and their signatures"""
+        relevant_functions = get_overridden_functions(cls.__base_cls__, obj) \
+            + get_new_functions(cls.__base_cls__, obj)
         ret = {}
-        for fn in get_overridden_methods(cls.__base_cls__, obj):
-            ret[fn] = FunctionSignature(getattr(obj, fn))
+        for fn in relevant_functions:
+            ret[fn] = cls.__function_signature__(getattr(obj, fn))
         return ret
 
-
-class ParameterSignature(ClassSignature):
-    """
-    Signature for Parameter objects
-    """
-    __base_cls__ = Parameter
-
-    def __init__(self, obj: Type[__base_cls__]) -> None:
-        return super().__init__(obj)
-
-
-class HyperParameterSignature(ParameterSignature):
-    """
-    Signature for HyperParameter objects
-    """
-    __base_cls__ = HyperParameter
-
-
-class ObjectVersion(BaseVersion, ClassSignature):
-    """
-    Version object for versioning spines BaseObject objects.
-    """
-    __base_cls__ = BaseObject
-
-    def __init__(self, obj: Type[__base_cls__]) -> None:
-        self._params = self._get_parameters(obj)
-        return super().__init__(obj)
-
     @classmethod
-    def _get_parameters(cls, obj: type) -> Dict[str, Type[BaseSignature]]:
-        """Gets the relevant parameters and their signatures"""
+    def _get_properties(cls, obj: type) -> Dict[str, Type[PropertySignature]]:
+        """Gets the relevant properties and their signatures"""
+        relevant_properties = (
+            get_overridden_properties(cls.__base_cls__, obj)
+            + get_new_properties(cls.__base_cls__, obj)
+        )
         ret = {}
-        for param in get_matching_attributes(obj, Parameter):
-            ret[param] = ParameterSignature(getattr(obj, param))
+        for p in relevant_properties:
+            ret[p] = cls.__property_signature__(obj.__dict__[p], p)
         return ret

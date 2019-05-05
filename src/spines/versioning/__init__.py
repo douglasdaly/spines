@@ -2,11 +2,16 @@
 """
 Versioning subpackage for spines.
 """
+from .core import ClassSignature
 from .core import FunctionSignature
-from . import utils
-
+from .core import PropertySignature
+from .mixins import SourceMixin
+from .mixins import VersionMixin
 
 __all__ = [
+    'ClassSignature',
     'FunctionSignature',
-    'utils',
+    'SourceMixin',
+    'PropertySignature',
+    'VersionMixin',
 ]

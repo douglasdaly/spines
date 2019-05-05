@@ -8,10 +8,13 @@ from ._version import get_versions
 __version__ = get_versions()['version']
 del get_versions
 
+from .config import get_config
+from .config import load_config
+from .config import set_config
 from .parameters import Parameter, HyperParameter
-from .parameters import Bounded, HyperBounded
+from .models import Model
+from . import parameters
 from . import transforms
-from .model import Model
 from . import utils
 
 __all__ = [
@@ -20,9 +23,12 @@ __all__ = [
     # Parameters
     'Parameter',
     'HyperParameter',
-    'Bounded',
-    'HyperBounded',
+    # Config
+    'get_config',
+    'load_config',
+    'set_config',
     # Submodules
+    'parameters',
     'transforms',
     'utils',
 ]
