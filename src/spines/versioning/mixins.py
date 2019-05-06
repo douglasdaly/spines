@@ -46,6 +46,9 @@ class VersionMixin(ABC):
         )
         return
 
+    def __call__(self, next_obj) -> Type['VersionMixin']:
+        return self.__class__(next_obj)
+
     def __repr__(self) -> str:
         return '<%s: name="%s" version="%s">' % (
             self.__class__.__name__, self.name, self.version

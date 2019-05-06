@@ -8,11 +8,14 @@ Versioning objects for core classes.
 from typing import Dict
 from typing import Type
 
+import parver
+
 from ..parameters.base import Parameter
 from ..parameters.versioning import ParameterSignature
 from ..utils.object import get_matching_attributes
 from ..versioning.base import Signature
 from ..versioning.core import ClassSignature
+from ..versioning.mixins import VersionMixin
 from .base import BaseObject
 
 
