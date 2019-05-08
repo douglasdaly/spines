@@ -85,3 +85,7 @@ class Signature(ABC):
     def _get_bytes(self, obj) -> bytes:
         """Gets the relevant bytes for a single object"""
         pass
+
+    def _get_source(self, obj) -> str:
+        """Gets the source code for the given object"""
+        return

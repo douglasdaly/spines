@@ -16,6 +16,13 @@ from .._vendored import autopep8 as _v_autopep8
 
 
 #
+#   Constants
+#
+
+INDENT_TAB = '    '
+
+
+#
 #   Functions
 #
 

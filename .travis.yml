@@ -13,3 +13,8 @@ script:
   - make coverage
 after_success:
   - coveralls
+branches:
+  only:
+  - master
+  - develop
+  - /^v\d+\.\d+(\.\d+)?(-\S*)?$/

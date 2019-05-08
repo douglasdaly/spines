@@ -5,9 +5,13 @@ Core classes for the spines versioning subpackage.
 #
 #   Imports
 #
+from collections import OrderedDict
+from textwrap import indent
 from types import FunctionType
 from typing import Any
+from typing import Callable
 from typing import Dict
+from typing import Mapping
 from typing import Tuple
 from typing import Type
 
@@ -17,11 +21,16 @@ except ImportError:
     T_OrderedDict = Dict
 
 from ..utils.function import get_hash_bytes
+from ..utils.function import get_source as get_source_fn
 from ..utils.function import get_specification
+from ..utils.object import get_doc_string
 from ..utils.object import get_new_functions
 from ..utils.object import get_new_properties
 from ..utils.object import get_overridden_functions
 from ..utils.object import get_overridden_properties
+from ..utils.property import get_source as get_source_prop
+from ..utils.string import INDENT_TAB
+from ..utils.string import format_code_style
 from .base import Signature
 
 
@@ -100,6 +109,10 @@ class FunctionSignature(Signature):
         """Gets the bytes to hash for a Function"""
         return get_hash_bytes(obj)
 
+    def _get_source(self, obj: FunctionType) -> str:
+        """Gets the source code for the function given"""
+        return get_source_fn(obj)
+
 
 class PropertySignature(Signature):
     """
@@ -151,6 +164,10 @@ class PropertySignature(Signature):
             ret += self._fdel.hash_bytes
         return ret
 
+    def _get_source(self, obj: property) -> str:
+        """Gets the source code for the property given"""
+        return get_source_prop(obj)
+
 
 class ClassSignature(Signature):
     """
@@ -192,6 +209,53 @@ class ClassSignature(Signature):
                 ret = t_bytes
             else:
                 ret += t_bytes
+        return ret
+
+    def _get_source(self, obj) -> str:
+        """Gets the source code for the given class"""
+        if not isinstance(obj, type):
+            obj = obj.__class__
+
+        docstr = get_doc_string(obj)
+        prop_source = self._get_signature_dict_sources(
+            obj, self._properties, get_source_prop
+        )
+        func_source = self._get_signature_dict_sources(
+            obj, self._functions, get_source_fn
+        )
+
+        ret = "class {class_name}({base_classes}):\n".format(
+            class_name=obj.__name__,
+            base_classes=', '.join([x.__name__ for x in obj.__bases__])
+        )
+        if docstr:
+            ret += indent('"""%s"""\n' % docstr, INDENT_TAB)
+        ret += '\n'
+        if '__init__' in func_source.keys():
+            ret += indent(func_source.pop('__init__') + '\n', INDENT_TAB)
+        for prop, src in prop_source.items():
+            ret += indent(src + '\n', INDENT_TAB)
+        for fn, src in func_source.items():
+            ret += indent(src + '\n', INDENT_TAB)
+
+        return format_code_style(ret)
+
+    @classmethod
+    def _get_signature_dict_sources(
+        cls,
+        obj,
+        signature_dict: Mapping[str, Type[Signature]],
+        source_func: Callable
+    ) -> T_OrderedDict[str, str]:
+        """Helper to get sources from a dictionary of Signatures"""
+        ret = OrderedDict()
+        for k in sorted(signature_dict.keys()):
+            v = signature_dict[k]
+            v_src = getattr(v, 'source', None)
+            if v_src:
+                ret[k] = v_src
+            else:
+                ret[k] = source_func(obj.__dict__[k])
         return ret
 
     @classmethod

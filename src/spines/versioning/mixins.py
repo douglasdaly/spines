@@ -8,21 +8,14 @@ Mixin classes for versioning subpackage.
 from abc import ABC
 from abc import abstractmethod
 from hashlib import blake2s
-from textwrap import indent
 from typing import Sequence
 from typing import Type
 
 import parver
 
 from .. import __version__
-from ..utils.function import get_source
 from ..utils.object import get_doc_string
-from ..utils.string import format_code_style
 from ..utils.string import slugify
-from ..utils.property import get_source as get_source_prop
-from .core import ClassSignature
-from .core import FunctionSignature
-from .core import PropertySignature
 
 
 #
@@ -126,9 +119,10 @@ class DependenciesMixin(ABC):
         """:obj:`tuple` of :obj:`str`: Dependencies of the object"""
         return self._dependencies
 
+    @abstractmethod
     def _get_dependencies(self, obj: [type, object]) -> Sequence[str]:
         """Gets the dependencies of the signed object"""
-        return tuple()
+        pass
 
 
 class SourceMixin(ABC):
@@ -145,58 +139,3 @@ class SourceMixin(ABC):
     def source(self) -> [str, None]:
         """:obj:`str`: Source code for the signature's object."""
         return self._source
-
-    def _get_source(self, obj: [object, type]) -> [str, None]:
-        """Gets the source code for the given object"""
-        ret = None
-        if any(issubclass(x, FunctionSignature)
-               for x in self.__class__.__bases__):
-            ret = get_source(obj)
-        elif any(issubclass(x, PropertySignature)
-                 for x in self.__class__.__bases__):
-            ret = get_source_prop(obj)
-        elif any(issubclass(x, ClassSignature)
-                 for x in self.__class__.__bases__):
-            if not isinstance(obj, type):
-                obj = obj.__class__
-
-            ret = "class {class_name}({base_classes}):\n".format(
-                class_name=obj.__name__,
-                base_classes=', '.join([x.__name__ for x in obj.__bases__])
-            )
-            docstr = get_doc_string(obj)
-            if docstr:
-                ret += indent('"""%s"""\n' % docstr, '    ')
-            ret += '\n'
-
-            fn_source = {}
-            for k, v in self._functions.items():
-                if hasattr(v, 'source'):
-                    fn_source[k] = v.source
-                else:
-                    fn_source[k] = get_source(getattr(obj, k))
-
-            prop_source = {}
-            for k, v in self._properties.items():
-                if hasattr(v, 'source'):
-                    prop_source[k] = v.source
-                else:
-                    prop_source[k] = get_source_prop(obj.__dict__[k])
-
-            if '__init__' in fn_source.keys():
-                ret += indent(fn_source['__init__'] + '\n', '    ')
-
-            prop_ordering = sorted(x for x in prop_source.keys())
-            for prop in prop_ordering:
-                src = prop_source[prop]
-                ret += indent(src + '\n', '    ')
-
-            fn_ordering = sorted(x for x in fn_source.keys()
-                                 if x != '__init___')
-            for fn in fn_ordering:
-                src = fn_source[fn]
-                ret += indent(src + '\n', '    ')
-
-            ret = format_code_style(ret)
-
-        return ret
