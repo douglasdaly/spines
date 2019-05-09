@@ -2,4 +2,4 @@
 """
 Settings and constants for config subpackage.
 """
-CONFIG_FILES = ('spines.toml', '.spines.toml')
+CONFIG_FILES = ('.spinesrc',)

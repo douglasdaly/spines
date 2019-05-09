@@ -150,7 +150,7 @@ update-requirements: -update-requirements-actual generate-requirements ## Update
 -update-requirements-actual:
 	(export PIP_USE_PEP517=false; $(UPDATE_DEPS))
 
-generate-requirements: ## Generates the project's requirements.txt files
+generate-requirements:
 	$(GENERATE_DEPS)
 
 # Documentation
@@ -176,7 +176,7 @@ authors-draft: ## Generates the draft AUTHORS file
 changes: ## Generates the changes files from the todo files
 	$(INVOKE) generate.todos
 
-changes-draft: ## Genereates the draft changes from the todo files
+changes-draft: ## Generates the draft changes from the todo files
 	$(INVOKE) generate.todos --draft
 
 changelog: ## Generates the new CHANGELOG.md file

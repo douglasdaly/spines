@@ -4,7 +4,8 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 
 [packages]
-spines = { path = ".",editable = true }
+spines = {path = ".",editable = true}
+appdirs = "*"
 click = "*"
 parver = "*"
 toml = "*"

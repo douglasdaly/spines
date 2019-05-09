@@ -1,5 +1,6 @@
 -i https://pypi.org/simple
 -e .
+appdirs==1.4.3
 arpeggio==1.9.0
 attrs==19.1.0
 click==7.0

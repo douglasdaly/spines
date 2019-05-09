@@ -9,6 +9,7 @@ from collections import defaultdict
 from collections.abc import Mapping
 from collections.abc import MutableMapping
 from typing import List
+from typing import Tuple
 from typing import Type
 
 
@@ -36,6 +37,8 @@ class BaseConfig(MutableMapping):
         if item is None:
             return
         key, sub_key = self._key_helper(item)
+        if key not in self._storage.keys():
+            raise KeyError("Setting not found: %s" % key)
         if sub_key:
             return self._storage[key][sub_key]
         return self._storage[key]
@@ -126,7 +129,7 @@ class BaseConfig(MutableMapping):
         return [self[k] for k in self.keys()]
 
     @staticmethod
-    def _key_helper(key: str) -> List[str]:
+    def _key_helper(key: str) -> Tuple[str, str]:
         """Helper function to get properly formatted keys"""
         ret = key.lower().split('.', 1)
         if len(ret) == 1:

@@ -35,6 +35,7 @@ if VERSION is None:
     raise EnvironmentError('Failed to read version')
 
 REQUIRES = [
+    'appdirs',
     'click',
     'parver',
     'toml',
