@@ -35,7 +35,7 @@ endif
 
 SUBDIR_ROOTS := docs src tests
 DIRS := . $(shell find $(SUBDIR_ROOTS) -type d)
-GARBAGE_PATTERNS := *.pyc *~ *-checkpoint.ipynb
+GARBAGE_PATTERNS := *.pyc *~ *-checkpoint.ipynb *.egg-info __pycache__/
 GARBAGE := $(foreach DIR,$(DIRS),$(addprefix $(DIR)/,$(GARBAGE_PATTERNS)))
 
 ifeq (, $(shell which direnv))
@@ -123,6 +123,9 @@ help: ## Displays this help message
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' Makefile | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-30s\033[0m %s\n", $$1, $$2}'
 	@echo ''
 
+clean: ## Delete all compiled Python files or temp files
+	@rm -rf $(GARBAGE)
+
 setup: venv-create requirements ## Sets up the environment
 	$(if $(DIRENV),$(DIRENV) allow,)
 
@@ -162,15 +165,6 @@ generate-docs: ## Generates the documentation files from the source files
 	@cd docs/ && $(RUN_PRE) sphinx-apidoc -e -M -o api ../src/spines
 	$(INVOKE) docs.generate-make
 
-# Cleaning
-
-clean: ## Delete all compiled Python files or temp files
-	@rm -rf $(GARBAGE)
-
-clean-build: ## Clean out the compiled package files
-	@rm -rf build/*
-	@rm -rf dist/*
-
 # Changes
 
 authors: ## Generates the AUTHORS file
@@ -191,21 +185,13 @@ changelog: ## Generates the new CHANGELOG.md file
 changelog-draft: ## Generates the draft new CHANGELOG.draft.md file
 	$(INVOKE) generate.changelog --draft
 
-# IPyKernel
-
-ipykernel-install:  ## Installs the IPyKernel for this environment
-	$(INVOKE) install.ipykernel
-
-ipykernel-uninstall: ## Uninstalls the IPyKernel for this environment
-	$(INVOKE) uninstall.ipykernel
-
 # Code
 
 lint: ## Lint using flake8
 	$(FLAKE8) src/spines/
 
 coverage: ## Runs code coverage checks over the codebase
-	$(PYTEST) --cov=src/spines tests/
+	$(PYTEST) --cov=src/spines -n $(PYTEST_CORES)
 
 # Unit testing
 
@@ -218,7 +204,7 @@ test-tox: ## Run the tox unit tests over the project
 test-watch: ## Run pytest-watch to run tests on project changes
 	$(PYTEST) -f -q -n $(PYTEST_CORES)
 
-tox-rebuild: ## Rebuilds the tox environments
+tox-rebuild: clean ## Rebuilds the tox environments
 	$(TOX) --recreate --notest
 
 # Distribution
@@ -229,6 +215,10 @@ build: clean-build ## Builds the library package
 
 check-build: ## Check the built packages prior to uploading
 	$(TWINE) check dist/*
+
+clean-build: ## Clean out the compiled package files
+	@rm -rf build/*
+	@rm -rf dist/*
 
 upload: ## Uploads the package to the PyPI server
 	$(TWINE) upload dist/*

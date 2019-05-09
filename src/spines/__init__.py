@@ -4,9 +4,7 @@ Spines
 
 Skeletons for parameterized models.
 """
-from ._version import get_versions
-__version__ = get_versions()['version']
-del get_versions
+from .__version__ import __version__
 
 from .config import get_config
 from .config import load_config

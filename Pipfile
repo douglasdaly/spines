@@ -4,7 +4,7 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 
 [packages]
-spines = {path = ".",editable = true}
+spines = { path = ".",editable = true }
 click = "*"
 parver = "*"
 toml = "*"
@@ -15,13 +15,12 @@ coverage = "*"
 flake8 = "*"
 git-fame = "*"
 invoke = "*"
-ipykernel = "*"
-jupyter = "*"
 mypy = "*"
 nbsphinx = "*"
 pandoc = "*"
 pytest = "*"
 pytest-cov = "*"
+pytest-timeout = "*"
 pytest-xdist = "*"
 python-dotenv = "*"
 sphinx = "*"
@@ -29,7 +28,3 @@ sphinx-rtd-theme = "*"
 towncrier = "*"
 tox = "*"
 twine = "*"
-versioneer = "*"
-
-[requires]
-python_version = "3.7"

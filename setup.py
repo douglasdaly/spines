@@ -1,21 +1,45 @@
 # -*- coding: utf-8 -*-
 """
 Setup file for Spines library.
+
+Incorporates code from:
+    https://github.com/sarugaku/cookiecutter-python-package
+
 """
 #
 #   Imports
 #
+import ast
+import os
+
 from setuptools import setup, find_packages
 
-import versioneer
-
 
 #
-#   Helpers
+#   Configuration
 #
 
-def read(file):
-    return open(file, encoding='utf-8').read()
+ROOT = os.path.dirname(__file__)
+
+PACKAGE_NAME = 'spines'
+
+VERSION = None
+
+with open(os.path.join(ROOT, 'src', PACKAGE_NAME, '__version__.py')) as fin:
+    for line in fin:
+        if line.startswith('__version__ = '):
+            VERSION = ast.literal_eval(line[len('__version__ = '):].strip())
+            break
+
+if VERSION is None:
+    raise EnvironmentError('Failed to read version')
+
+REQUIRES = [
+    'click',
+    'parver',
+    'toml',
+    'xxhash',
+]
 
 
 #
@@ -23,45 +47,31 @@ def read(file):
 #
 
 setup(
-    name='spines',
-    description='Backbones for parameterized models.',
+    name="spines",
+    version=VERSION,
     package_dir={'': 'src'},
     packages=find_packages('src', include=['spines', 'spines.*']),
-    include_package_data=True,
+    entry_points={
+        "console_scripts": [
+            "spines=spines:cli",
+        ]
+    },
 
-    author='Douglas Daly',
-    author_email='contact@douglasdaly.com',
-    url='https://www.github.com/douglasdaly/spines',
+    include_package_data=True,
+    package_data={
+        '': ['*LICENSE', 'README*'],
+    },
+
+    python_requires=">=3.6",
+    install_requires=REQUIRES,
+    extras_require={
+        "test": [
+            "pytest", "pytest-cov", "pytest-timeout", "pytest-xdist"
+        ],
+    },
+
     project_urls={
         'Source Code': 'https://www.github.com/douglasdaly/spines',
         'Documentation': 'https://spines.readthedocs.io/',
-    },
-    long_description=read('README.md'),
-    long_description_content_type='text/markdown',
-
-    version=versioneer.get_version(),
-    cmdclass=versioneer.get_cmdclass(),
-    install_requires=[
-        'parver',
-        'toml',
-        'xxhash',
-    ],
-    tests_require=[
-        'pytest',
-        'pytest-cov',
-    ],
-    setup_requires=[
-        'pytest-runner',
-    ],
-
-    license='MIT',
-    keywords="spines parameterized models",
-    classifiers=[
-        'Development Status :: 2 - Pre-Alpha',
-        'Intended Audience :: Science/Research',
-        'Topic :: Scientific/Engineering',
-        'Programming Language :: Python :: 3.6',
-        'Programming Language :: Python :: 3.7',
-        'License :: OSI Approved :: MIT License',
-    ],
+    }
 )
