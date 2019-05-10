@@ -2,4 +2,8 @@
 """
 Command line functionality for spines.
 """
-from .command import cli
+from .core import cli
+
+__all__ = [
+    'cli',
+]

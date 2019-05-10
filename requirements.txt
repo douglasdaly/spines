@@ -3,8 +3,16 @@
 appdirs==1.4.3
 arpeggio==1.9.0
 attrs==19.1.0
+certifi==2019.3.9
+chardet==3.0.4
 click==7.0
+colorama==0.4.1
+crayons==0.2.0
+idna==2.8
 parver==0.2.1
+requests==2.21.0
 six==1.12.0
 toml==0.10.0
+urllib3==1.24.3
+vistir==0.4.0
 xxhash==1.3.0

@@ -5,7 +5,6 @@ Primary configuration interface
 #
 #   Imports
 #
-from functools import partial
 from typing import Tuple
 from typing import Type
 

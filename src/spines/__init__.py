@@ -4,8 +4,7 @@ Spines
 
 Skeletons for parameterized models.
 """
-from .__version__ import __version__
-
+from .__version__ import __version__  # noqa
 from .config import get_config
 from .config import load_config
 from .config import set_config

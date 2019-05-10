@@ -37,8 +37,10 @@ if VERSION is None:
 REQUIRES = [
     'appdirs',
     'click',
+    'crayons',
     'parver',
     'toml',
+    'vistir',
     'xxhash',
 ]
 
@@ -54,7 +56,7 @@ setup(
     packages=find_packages('src', include=['spines', 'spines.*']),
     entry_points={
         "console_scripts": [
-            "spines=spines:cli",
+            "spines=spines.cli:cli",
         ]
     },
 
