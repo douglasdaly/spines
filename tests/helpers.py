@@ -5,8 +5,18 @@ Helper functions and classes for unit tests.
 #
 #   Imports
 #
+import os
+
 from spines import Model
 from spines import Parameter
+
+
+#
+#   Constants
+#
+
+TESTS_ROOT = os.path.abspath(os.path.dirname(__file__))
+RESOURCE_DIR = os.path.join(TESTS_ROOT, 'resources')
 
 
 #

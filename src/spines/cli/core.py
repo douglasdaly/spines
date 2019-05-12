@@ -14,6 +14,7 @@ import crayons
 from ..__version__ import __version__
 from .base import SpinesCLI
 from .base import pass_state
+from .options import core_options
 from .settings import CONTEXT_SETTINGS
 
 
@@ -25,6 +26,7 @@ from .settings import CONTEXT_SETTINGS
        context_settings=CONTEXT_SETTINGS)
 @pass_context
 @pass_state
+@core_options
 @version_option(prog_name=crayons.normal("spines", bold=True),
                 version=__version__)
 def cli(ctx, state, **kwargs):

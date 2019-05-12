@@ -6,10 +6,14 @@ Utilities for working with strings.
 #   Imports
 #
 import difflib
+from fnmatch import fnmatch
 import re
 from textwrap import dedent
 from typing import Iterable as T_Iterable
 from typing import List
+from typing import Sequence
+from typing import Tuple
+from typing import Union
 import unicodedata
 
 from .._vendored import autopep8 as _v_autopep8
@@ -131,3 +135,42 @@ def format_code_style(code: str) -> str:
 
     """
     return _v_autopep8.fix_code(dedent(code))
+
+
+def filter_strings(
+    strings: [str, Sequence[str]],
+    pattern: [str, Sequence[str]],
+    *patterns: Tuple[Union[str, Sequence[str]], ...]
+) -> Sequence[str]:
+    """Filters the given strings using the given pattern(s)
+
+    Parameters
+    ----------
+    strings : :obj:`str` or :obj:`Iterable` of :obj:`str`
+        String(s) to filter.
+    pattern : :obj:`str` or :obj:`Iterable` of :obj:`str`
+        Pattern to filter with, can be other string(s), patterns using
+        UNIX-style wild-cards or regex strings.
+    patterns : :obj:`str` or :obj:`Iterable` of :obj:`str`
+        Additional pattern(s) to filter with.
+
+    Returns
+    -------
+    :obj:`list` of :obj:`str`
+        The strings from the given `strings` which matched the
+        filters given.
+    """
+    if isinstance(pattern, str):
+        pattern = [pattern]
+    for p in patterns:
+        if isinstance(p, str):
+            pattern.append(p)
+        else:
+            pattern.extend(p)
+
+    filtered = []
+    for s in strings:
+        for p in pattern:
+            if s == p or fnmatch(s, p) or re.match(s, p):
+                filtered.append(s)
+    return filtered
