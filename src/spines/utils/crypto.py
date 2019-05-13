@@ -186,9 +186,14 @@ def generate_hash_file(
         for dirpath, subdirs, filenames in os.walk(path):
             if not recurse:
                 subdirs.clear()
-            filt_files = filenames.copy()
-
-            for file in filt_files:
+            filt_files = _get_file_mapping(
+                filenames, include=include, exclude=exclude
+            )
+            bin_modes = _get_file_mapping(
+                filenames, default=binary_mode, include=binary_include,
+                exclude=binary_exclude
+            )
+            for file in [k for k, v in filt_files.items() if v]:
                 contents.append(_generate_hash_file_line(
                     os.path.join(dirpath, file),
                     root=path,
@@ -216,7 +221,12 @@ def _generate_hash_file_line(path, root=None, binary_mode=False):
     return f"{f_hash} {mode_str}{f_name}\n"
 
 
-def _get_file_mapping(filenames, default=True, include=None, exclude=None):
+def _get_file_mapping(
+    filenames: Sequence[str],
+    default: bool = True,
+    include: [str, Sequence[str]] = None,
+    exclude: [str, Sequence[str]] = None
+) -> Dict[str, bool]:
     """Helper to get a mapping of file to value for the given filters"""
     if include:
         inc_files = filter_strings(filenames, include)
@@ -226,7 +236,16 @@ def _get_file_mapping(filenames, default=True, include=None, exclude=None):
         exc_files = filter_strings(filenames, exclude)
     else:
         exc_files = []
-    return
+
+    ret = {}
+    for file in filenames:
+        if file in inc_files:
+            ret[file] = True
+        elif file in exc_files:
+            ret[file] = False
+        else:
+            ret[file] = default
+    return ret
 
 
 def load_hashes(path, *paths: Tuple[str, ...]) -> Dict[str, Tuple[bool, str]]:
