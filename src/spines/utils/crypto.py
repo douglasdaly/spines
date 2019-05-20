@@ -5,7 +5,6 @@ Cryptographic utilities for Spines.
 #
 #   Imports
 #
-from collections import defaultdict
 from hashlib import sha256
 import os
 from typing import Dict
@@ -174,8 +173,10 @@ def generate_hash_file(
     if not output:
         output = generate_hash_file_name(path)
 
-    if os.path.exists(output) and not overwrite:
-        raise FileExistsError("Hash file already exists: %s" % output)
+    if os.path.exists(output):
+        if not overwrite:
+            raise FileExistsError("Hash file already exists: %s" % output)
+        os.remove(output)
 
     if os.path.isfile(path):
         contents = _generate_hash_file_line(
@@ -201,10 +202,10 @@ def generate_hash_file(
                 ))
         contents = ''.join(contents)
 
-    with open(hash_file, 'w') as fout:
+    with open(output, 'w') as fout:
         fout.write(contents)
 
-    return hash_file
+    return output
 
 
 def _generate_hash_file_line(path, root=None, binary_mode=False):
@@ -325,7 +326,7 @@ def verify_hashes(
     if not hash_path:
         hash_path = find_hash_file(path)
     if not hash_path:
-        raise ValueError(
+        raise FileNotFoundError(
             "Could not find the hash file, please provide the hash_path"
         )
     l_hashes = load_hashes(hash_path)
@@ -381,7 +382,7 @@ def find_hash_file(path: str, *paths: Tuple[str, ...]) -> str:
 
     path = os.path.dirname(path)
     file_name = generate_hash_file_name(path)
-    if os.path.exists(dir_file):
+    if os.path.exists(file_name):
         return file_name
 
     return

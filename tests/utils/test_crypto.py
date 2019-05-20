@@ -6,6 +6,8 @@ Tests for the spines crypto utilities.
 #   Imports
 #
 import os
+import shutil
+import tempfile
 
 from spines.utils import crypto
 
@@ -102,3 +104,22 @@ class TestHashing(object):
                 assert v is False
             else:
                 assert v
+        return
+
+    def test_generate_hash_file_simple(self):
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            tmp_hash_dir = os.path.join(tmp_dir, 'test_dir')
+            shutil.copytree(
+                os.path.join(HASHING_DIR, 'test_dir'),
+                tmp_hash_dir
+            )
+            shutil.move(os.path.join(tmp_hash_dir, 'test_dir.sha256'), tmp_dir)
+            g_file = crypto.generate_hash_file(tmp_hash_dir)
+            l_hashes = crypto.load_hashes(g_file)
+            p_hashes = crypto.load_hashes(
+                os.path.join(tmp_dir, 'test_dir.sha256')
+            )
+
+            assert l_hashes == p_hashes
+
+        return

@@ -5,6 +5,7 @@ Primary configuration interface
 #
 #   Imports
 #
+from contextlib import contextmanager
 from typing import Tuple
 from typing import Type
 
@@ -32,7 +33,10 @@ _GLOBAL_CONFIG = None
 #   Functions
 #
 
-def get_config(setting: str = _MISSING, default=_MISSING) -> Type[Config]:
+def get_config(
+    setting: str = _MISSING,
+    default=_MISSING
+) -> Type[Config]:
     """Get the global spines configuration
 
     Parameters
@@ -67,17 +71,20 @@ def get_config(setting: str = _MISSING, default=_MISSING) -> Type[Config]:
     return _GLOBAL_CONFIG.get(setting, default)
 
 
-def set_config(**settings) -> None:
+def set_config(section: str = None, **settings) -> None:
     """Sets global configuration setting(s)
 
     Parameters
     ----------
+    section : str, optional
+        Configuration section to set settings in.
     settings
         The setting(s) in the global configuration to update.
 
     """
     global _GLOBAL_CONFIG
-    _GLOBAL_CONFIG = _update_config(_GLOBAL_CONFIG, **settings)
+    _GLOBAL_CONFIG = _update_config(_GLOBAL_CONFIG, section=section,
+                                    **settings)
     return
 
 
@@ -114,6 +121,7 @@ def load_config(*path: Tuple[str], update: bool = False) -> None:
 def _update_config(
     config: Type[Config],
     *other: Tuple[Type[Config]],
+    section: str = None,
     **settings
 ) -> Type[Config]:
     """Updates the given configuration object"""
@@ -122,6 +130,33 @@ def _update_config(
         updated.update(other_cfg)
 
     if settings:
-        updated.update(**settings)
+        if section:
+            updated[section].update(**settings)
+        else:
+            updated.update(**settings)
 
     return updated
+
+
+@contextmanager
+def temp_config(section: str = None, **settings):
+    """Temporary configuration context manager
+
+    Parameters
+    ----------
+    section : str, optional
+        Configuration section to set settings in.
+    settings
+        Setting(s) to change within the managed context on the global
+        configuration.
+
+    """
+    global _GLOBAL_CONFIG
+
+    orig_cfg = _GLOBAL_CONFIG.copy()
+    try:
+        set_config(section=section, **settings)
+        yield
+    finally:
+        _GLOBAL_CONFIG = orig_cfg
+    return

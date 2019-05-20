@@ -6,6 +6,7 @@ Unit tests for the config subpackage.
 #   Imports
 #
 from spines.config.base import BaseConfig
+from spines.config import config
 
 
 #
@@ -84,3 +85,10 @@ class TestBaseConfig(object):
 
         assert cfg_a2b['b'] == cfg_b['b']
         assert cfg_b2a['b'] == cfg_b['b']
+
+
+class TestConfig(object):
+    """
+    Tests for the general config functions
+    """
+    pass
