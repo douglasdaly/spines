@@ -29,4 +29,4 @@ from .options import path_argument
 @common_options
 def cli(ctx, state, init_state, path, **kwargs):
     """Project initialization tool."""
-    return
+    pass

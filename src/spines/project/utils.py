@@ -5,9 +5,11 @@ Utility funtions for the project subpackage.
 #
 #   Imports
 #
+import os
 from pathlib import Path
 
 from .settings import PROJECT_DIRNAME
+from .settings import PROJECT_FILE
 
 
 #
@@ -40,3 +42,56 @@ def find_project_dir(path: str = None) -> str:
             return str(c_path)
         c_path = c_path.parent
     return None
+
+
+def create_project_dir(path: str) -> str:
+    """Creates a new project directory at the given path
+
+    Parameters
+    ----------
+    path : str
+        Path to create a new project directory in.
+
+    Returns
+    -------
+    str
+        Path to the newly created project folder.
+
+    Raises
+    ------
+    FileExistsError
+        If a project directory already exists at the `path` given.
+
+    """
+    proj_dir = os.path.join(path, PROJECT_DIRNAME)
+    if os.path.exists(proj_dir):
+        raise FileExistsError(proj_dir)
+    os.mkdir(proj_dir)
+    return proj_dir
+
+
+def create_project_file(path: str) -> str:
+    """Creates a new project file at the given path
+
+    Parameters
+    ----------
+    path : str
+        Path to the newly created project file.
+
+    Returns
+    -------
+    str
+        Path to the newly created project file.
+
+    Raises
+    ------
+    FileExistsError
+        If the project file already exists at the `path` given.
+
+    """
+    proj_file = os.path.join(path, PROJECT_FILE)
+    if os.path.exists(proj_file):
+        raise FileExistsError(proj_file)
+    new_proj = Project()
+
+    return proj_file

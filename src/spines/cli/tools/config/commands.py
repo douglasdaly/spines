@@ -76,3 +76,14 @@ def set(ctx, state, cfg_state, name, value, **kwargs):
 def unset(ctx, state, cfg_state, name, **kwargs):
     """Unset a configuration value."""
     pass
+
+
+@cli.group('plugin', context_settings=SUBCOMMAND_CONTEXT)
+@pass_config_state
+@pass_state
+@pass_context
+@config_options
+@common_options
+def plugin(ctx, state, cfg_state, **kwargs):
+    """Plugin configuration tools"""
+    pass

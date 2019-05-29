@@ -57,7 +57,7 @@ class BaseConfig(MutableMapping):
                 self._storage[key] = value
         return
 
-    def __delitem__(self, key) -> None:
+    def __delitem__(self, key: str) -> None:
         if key is None:
             return
         key, sub_key = self._key_helper(key)
@@ -84,15 +84,20 @@ class BaseConfig(MutableMapping):
             return sub_key in self._storage[key]
         return True
 
-    def __getattr__(self, attr):
+    def __getattr__(self, name):
         try:
-            return super().__getattribute__(attr)
+            return super().__getattribute__(name)
         except AttributeError as ex:
             try:
-                return self.get(attr)
+                return self.__getitem__(name)
             except KeyError:
                 raise ex
         return
+
+    def __setattr__(self, name, value):
+        if '_storage' not in self.__dict__ or name in self.__dict__:
+            return super().__setattr__(name, value)
+        return self.__setitem__(name, value)
 
     @property
     def default_cls(self) -> type:
