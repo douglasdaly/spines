@@ -15,6 +15,7 @@ from .base import SpinesCLI
 from .options import core_options
 from .options import pass_state
 from .settings import CONTEXT_SETTINGS
+from .settings import STYLIZED_NAME
 
 
 @group(cls=SpinesCLI, invoke_without_command=True,
@@ -22,8 +23,8 @@ from .settings import CONTEXT_SETTINGS
 @pass_state
 @pass_context
 @core_options
-@version_option(prog_name=style("spines", bold=True),
-                version=__version__)
+@version_option(prog_name=style(STYLIZED_NAME, fg='green', bold=True),
+                version=__version__, message='%(prog)s %(version)34s\n')
 def cli(ctx, state, **kwargs):
     """
     Spines

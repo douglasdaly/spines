@@ -2,15 +2,15 @@
 """
 Click settings and constants for the CLI interface.
 """
-#
-#   Imports
-#
 import os
+import textwrap
 
 
-#
-#   Settings
-#
+STYLIZED_NAME = textwrap.indent(textwrap.dedent(
+    """     __   __          ___  __
+    /__` |__) | |\ | |__  /__`
+    .__/ |    | | \| |___ .__/
+    """), '  ')
 
 TOOLS_FOLDER = os.path.abspath(
     os.path.join(os.path.dirname(__file__), 'tools')
