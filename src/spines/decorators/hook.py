@@ -2,15 +2,8 @@
 """
 Decorators for hooking functions.
 """
-#
-#   Imports
-#
 from functools import wraps
 
-
-#
-#   Decorators
-#
 
 def add_callback(
     callback: callable,

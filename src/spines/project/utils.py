@@ -2,19 +2,12 @@
 """
 Utility funtions for the project subpackage.
 """
-#
-#   Imports
-#
 import os
 from pathlib import Path
 
 from .settings import PROJECT_DIRNAME
 from .settings import PROJECT_FILE
 
-
-#
-#   Functions
-#
 
 def find_project_dir(path: str = None) -> str:
     """Finds the project's base directory

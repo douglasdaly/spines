@@ -2,9 +2,6 @@
 """
 File utilities for spines.
 """
-#
-#   Imports
-#
 import os
 import pickle
 import tarfile
@@ -13,17 +10,9 @@ from typing import Tuple
 import zipfile
 
 
-#
-#   Constants
-#
-
 _DEFAULT_ARCHIVE_FORMAT = 'zip'
 _DEFAULT_TAR_COMPRESSION = 'gzip'
 
-
-#
-#   Functions
-#
 
 def save_pickle(obj, *path: Tuple[str]) -> str:
     """Save a single object, pickled, to file

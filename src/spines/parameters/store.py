@@ -2,9 +2,6 @@
 """
 Parameter storage module.
 """
-#
-#   Imports
-#
 from collections.abc import MutableMapping
 from typing import Dict
 from typing import Iterator
@@ -14,10 +11,6 @@ from .base import Parameter
 from .base import MissingParameterException
 from .decorators import state_changed
 
-
-#
-#   Classes
-#
 
 class ParameterStore(MutableMapping):
     """

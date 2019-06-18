@@ -2,16 +2,9 @@
 """
 Utilities for working with properties.
 """
-#
-#   Imports
-#
 from .function import get_source as get_source_fn
 from .string import format_code_style
 
-
-#
-#   Functions
-#
 
 def get_source(prop: property, pep8: bool = True) -> str:
     """Gets the source code for the given property

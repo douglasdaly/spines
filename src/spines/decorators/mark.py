@@ -2,15 +2,8 @@
 """
 Decorators related to marking objects and their attributes.
 """
-#
-#   Imports
-#
 from functools import wraps
 
-
-#
-#   Decorators
-#
 
 def override(func):
     """Marks the given function as overridden

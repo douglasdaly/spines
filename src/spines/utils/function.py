@@ -2,9 +2,6 @@
 """
 Utilities for working with functions.
 """
-#
-#   Imports
-#
 from collections import OrderedDict
 import inspect
 from types import FunctionType
@@ -19,10 +16,6 @@ except ImportError:
 
 from .string import format_code_style
 
-
-#
-#   Functions
-#
 
 def get_hash_bytes(func: FunctionType) -> bytes:
     """Gets a byte-representation of a function object for hashing

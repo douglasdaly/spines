@@ -2,16 +2,9 @@
 """
 Base classes for model parameters.
 """
-#
-#   Imports
-#
 from abc import ABC
 from typing import Type
 
-
-#
-#   Base classes
-#
 
 class Parameter(object):
     """
@@ -228,10 +221,6 @@ class ParameterMixin(ABC):
             value, raise_exceptions=raise_exceptions
         )
 
-
-#
-#   Exceptions
-#
 
 class ParameterException(Exception):
     """

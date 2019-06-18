@@ -2,9 +2,6 @@
 """
 Versioning objects for core classes.
 """
-#
-#   Imports
-#
 from typing import Dict
 from typing import Type
 
@@ -18,10 +15,6 @@ from ..versioning.core import ClassSignature
 from ..versioning.mixins import VersionMixin
 from .base import BaseObject
 
-
-#
-#   Signatures
-#
 
 class BaseObjectSignature(ClassSignature):
     """

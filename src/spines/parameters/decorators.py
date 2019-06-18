@@ -2,16 +2,9 @@
 """
 Decorators for parameters module.
 """
-#
-#   Imports
-#
 from functools import wraps
 from typing import Type
 
-
-#
-#   Decorators
-#
 
 def state_changed(func):
     """Decorator indicating a function which changes the state

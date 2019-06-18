@@ -2,16 +2,9 @@
 """
 Decorators for Models
 """
-#
-#   Imports
-#
 from functools import wraps
 from typing import Callable
 
-
-#
-#   Decorators
-#
 
 def negate(func: Callable):
     """Negate's the given functions output

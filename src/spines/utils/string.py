@@ -2,9 +2,6 @@
 """
 Utilities for working with strings.
 """
-#
-#   Imports
-#
 import difflib
 from fnmatch import fnmatch
 import re
@@ -19,16 +16,8 @@ import unicodedata
 from .._vendored import autopep8 as _v_autopep8
 
 
-#
-#   Constants
-#
-
 INDENT_TAB = '    '
 
-
-#
-#   Functions
-#
 
 def slugify(value: str, allow_unicode: bool = False) -> str:
     """Slugifys the given string

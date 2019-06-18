@@ -2,15 +2,8 @@
 """
 Utilities for working with the environment.
 """
-#
-#   Imports
-#
 import os
 
-
-#
-#   Utility functions
-#
 
 def is_truthy(name):
     """Gets whether or not the  given environment variable is 'truthy'

@@ -2,9 +2,6 @@
 """
 Utilities for working with objects.
 """
-#
-#   Imports
-#
 from collections.abc import Iterable
 import inspect
 from types import FunctionType
@@ -15,10 +12,6 @@ from typing import Tuple
 
 from ..decorators.input import to_class
 
-
-#
-#   Functions
-#
 
 def get_doc_string(obj: Any) -> str:
     """Gets the documentation string for the given object

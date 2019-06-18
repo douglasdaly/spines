@@ -2,14 +2,6 @@
 """
 Base classes for the project subpackage.
 """
-#
-#   Imports
-#
-
-
-#
-#   Base classes
-#
 
 class Project(object):
     """

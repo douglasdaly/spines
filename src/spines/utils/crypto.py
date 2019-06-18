@@ -2,9 +2,6 @@
 """
 Cryptographic utilities for Spines.
 """
-#
-#   Imports
-#
 from hashlib import sha256
 import os
 from typing import Dict
@@ -14,19 +11,11 @@ from typing import Tuple
 from .string import filter_strings
 
 
-#
-#   Constants
-#
-
 HASH_FUNCTION = sha256
 HASH_EXTENSION = '.sha256'
 
 _CHUNK_SIZE = 1024
 
-
-#
-#   Utility functions
-#
 
 def hash_file(
     path: str,

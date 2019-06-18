@@ -2,18 +2,11 @@
 """
 Decorators for modifying function's inputs
 """
-#
-#   Imports
-#
 from functools import wraps
 from inspect import signature
 from typing import Tuple
 from typing import Union
 
-
-#
-#   Decorators
-#
 
 def to_class(*args: Tuple[Union[int, str], ...]) -> Tuple[type, ...]:
     """Converts input(s) to types from inputs specified

@@ -2,9 +2,6 @@
 """
 Base classes for core spines library.
 """
-#
-#   Imports
-#
 from abc import ABC
 import tempfile
 from typing import List
@@ -19,10 +16,6 @@ from ..utils.file import save_pickle
 from ..utils.file import load_pickle
 from ..utils.object import get_overridden_functions
 
-
-#
-#   Classes
-#
 
 class BaseObject(ABC):
     """
@@ -244,10 +237,6 @@ class BaseObject(ABC):
             setattr(self, method, override(getattr(self, method)))
         return
 
-
-#
-#   Exceptions
-#
 
 class BaseObjectException(Exception):
     """

@@ -17,10 +17,6 @@ from .options import pass_state
 from .settings import CONTEXT_SETTINGS
 
 
-#
-#   Commands
-#
-
 @group(cls=SpinesCLI, invoke_without_command=True,
        context_settings=CONTEXT_SETTINGS)
 @pass_state
@@ -29,13 +25,11 @@ from .settings import CONTEXT_SETTINGS
 @version_option(prog_name=style("spines", bold=True),
                 version=__version__)
 def cli(ctx, state, **kwargs):
-    """Spines"""
+    """
+    Spines
+    """
     pass
 
-
-#
-#   Entry-point
-#
 
 if __name__ == "__main__":
     cli()

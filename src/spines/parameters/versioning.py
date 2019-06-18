@@ -2,19 +2,12 @@
 """
 Versioning objects for Parameters.
 """
-#
-#   Imports
-#
 from typing import Type
 
 from ..versioning.core import ClassSignature
 from .base import Parameter
 from .base import HyperParameter
 
-
-#
-#   Signatures
-#
 
 class ParameterSignature(ClassSignature):
     """
@@ -23,7 +16,6 @@ class ParameterSignature(ClassSignature):
     __base_cls__ = Parameter
 
     def __init__(self, obj: Type[__base_cls__]) -> None:
-        self._
         return super().__init__(obj)
 
 

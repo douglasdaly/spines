@@ -2,15 +2,8 @@
 """
 Parameter factory functions
 """
-#
-#   Imports
-#
 from .base import ParameterMixin
 
-
-#
-#   Factory functions
-#
 
 def bound_mixin(name, checker, cls_name=None):
     """Creates a new mixin class for bounded parameters

@@ -40,7 +40,7 @@ namely:
 - Error
 - Score
 
-The ```predict``` method is the only one that's required to be 
+The ``predict`` method is the only one that's required to be 
 implemented, though the others are likely useful most of the time (and 
 often required to take advantage of some of the additional features 
 provided by spines).

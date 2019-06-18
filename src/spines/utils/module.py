@@ -2,18 +2,11 @@
 """
 Utilities for working with modules.
 """
-#
-#   Imports
-#
 from importlib import import_module
 from types import ModuleType
 from typing import Dict
 from typing import Sequence
 
-
-#
-#   Utility functions
-#
 
 def load_modules(
     module: str,

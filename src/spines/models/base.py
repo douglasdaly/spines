@@ -2,9 +2,6 @@
 """
 Model class for the spines package.
 """
-#
-#   Imports
-#
 from abc import abstractmethod
 from typing import Dict
 from typing import List
@@ -20,10 +17,6 @@ from ..parameters.decorators import finalize_pre
 from ..parameters.store import ParameterStore
 from ..transforms.base import Transform
 
-
-#
-#   Model class
-#
 
 class Model(Transform):
     """

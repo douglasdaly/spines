@@ -2,18 +2,11 @@
 """
 Mixin classes for Parameters.
 """
-#
-#   Imports
-#
 from operator import gt
 from operator import lt
 
 from .factories import bound_mixin
 
-
-#
-#   Mixins
-#
 
 class Maximum(bound_mixin('maximum', lt)):
     """
