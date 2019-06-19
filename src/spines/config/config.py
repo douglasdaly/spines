@@ -2,9 +2,6 @@
 """
 Primary configuration interface
 """
-#
-#   Imports
-#
 from contextlib import contextmanager
 from typing import Tuple
 from typing import Type
@@ -15,23 +12,10 @@ from . import utils
 from .core import Config
 
 
-#
-#   Constants
-#
-
 _MISSING = make_sentinel(var_name='_MISSING')
-
-
-#
-#   Variables
-#
 
 _GLOBAL_CONFIG = None
 
-
-#
-#   Functions
-#
 
 def get_config(
     setting: str = _MISSING,

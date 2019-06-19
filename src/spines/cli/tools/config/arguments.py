@@ -2,9 +2,6 @@
 """
 Arguments and argument groups for the config tool.
 """
-#
-#   Imports
-#
 import click.types
 from click import argument
 

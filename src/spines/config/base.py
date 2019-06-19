@@ -142,10 +142,6 @@ class BaseConfig(MutableMapping):
         return ret[0], ret[1]
 
 
-#
-#   Exceptions
-#
-
 class BaseConfigException(Exception):
     """
     Base exception class for configuration subpackage

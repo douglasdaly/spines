@@ -2,9 +2,6 @@
 """
 Common options for click commands.
 """
-#
-#   Imports
-#
 import os
 
 import click.types
@@ -17,7 +14,7 @@ from ..project.utils import find_project_dir
 
 
 #
-#   State object
+#   State
 #
 
 class State(object):

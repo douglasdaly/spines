@@ -2,9 +2,6 @@
 """
 Options for the initialization tool.
 """
-#
-#   Imports
-#
 import os
 
 import click.types
@@ -17,7 +14,7 @@ from ....project.settings import PROJECT_FILE
 
 
 #
-#   State object
+#   State
 #
 
 class InitState(object):
@@ -48,7 +45,7 @@ pass_init_state = make_pass_decorator(InitState, ensure=True)
 
 
 #
-#   Argument decorators
+#   Arguments
 #
 
 def path_argument(f):
@@ -65,7 +62,7 @@ def path_argument(f):
 
 
 #
-#   Option decorators
+#   Options
 #
 
 def force_option(f):
@@ -82,7 +79,7 @@ def force_option(f):
 
 
 #
-#   Option group
+#   Option groups
 #
 
 def init_options(f):

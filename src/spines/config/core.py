@@ -2,18 +2,11 @@
 """
 Core configuration subpackage functionality.
 """
-#
-#   Imports
-#
 from typing import Dict
 from typing import Type
 
 from .base import BaseConfig
 
-
-#
-#   Configuration classes
-#
 
 class Config(BaseConfig):
     """

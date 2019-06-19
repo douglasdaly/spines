@@ -8,6 +8,7 @@ spines = {path = ".",editable = true}
 appdirs = "*"
 click = "*"
 parver = "*"
+sortedcontainers = "*"
 toml = "*"
 vistir = "*"
 watchdog = "*"

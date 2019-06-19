@@ -2,9 +2,6 @@
 """
 Main click command for spines command line tool.
 """
-#
-#   Imports
-#
 from click import group
 from click import pass_context
 from click import style

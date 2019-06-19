@@ -2,12 +2,10 @@
 """
 Configuration CLI tool.
 """
-#
-#   Imports
-#
 from click import group
 from click import pass_context
 
+from ....config import get_config
 from ...options import common_options
 from ...options import pass_state
 from ...settings import SUBCOMMAND_CONTEXT
@@ -17,10 +15,6 @@ from .options import config_options
 from .options import pass_config_state
 
 
-#
-#   Commands
-#
-
 @group('config', context_settings=SUBCOMMAND_CONTEXT)
 @pass_config_state
 @pass_state
@@ -28,7 +22,7 @@ from .options import pass_config_state
 @config_options
 @common_options
 def cli(ctx, state, cfg_state, **kwargs):
-    """Configuration utility."""
+    """Configuration utility for Spines."""
     pass
 
 
@@ -39,7 +33,7 @@ def cli(ctx, state, cfg_state, **kwargs):
 @config_options
 @common_options
 def init(ctx, state, cfg_state, **kwargs):
-    """Initializes a spines config file."""
+    """Initializes a new Spines config file."""
     pass
 
 
@@ -51,7 +45,12 @@ def init(ctx, state, cfg_state, **kwargs):
 @common_options
 def list(ctx, state, cfg_state, **kwargs):
     """Lists configuration settings."""
-    pass
+    cfg = get_config()
+    for k, v in cfg.items():
+        if k.startswith('_'):
+            continue
+        print("%-20s  %s" % (k, v))
+    return
 
 
 @cli.command(context_settings=SUBCOMMAND_CONTEXT)
@@ -62,7 +61,7 @@ def list(ctx, state, cfg_state, **kwargs):
 @config_options
 @common_options
 def set(ctx, state, cfg_state, name, value, **kwargs):
-    """Set a configuration value."""
+    """Set a configuration setting."""
     pass
 
 
@@ -74,7 +73,7 @@ def set(ctx, state, cfg_state, name, value, **kwargs):
 @config_options
 @common_options
 def unset(ctx, state, cfg_state, name, **kwargs):
-    """Unset a configuration value."""
+    """Unset a configuration setting."""
     pass
 
 
@@ -85,5 +84,5 @@ def unset(ctx, state, cfg_state, name, **kwargs):
 @config_options
 @common_options
 def plugin(ctx, state, cfg_state, **kwargs):
-    """Plugin configuration tools"""
+    """Plugin configuration tools."""
     pass

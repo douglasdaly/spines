@@ -2,29 +2,23 @@
 """
 Base classes for transforms subpackage.
 """
-#
-#   Imports
-#
 from abc import ABCMeta
 from abc import abstractmethod
+from typing import Any
 from typing import Dict
 
 from ..core.base import BaseObject
 
-
-#
-#   Base class
-#
 
 class Transform(BaseObject, metaclass=ABCMeta):
     """
     Base Transform class
     """
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         return super().__init__(*args, **kwargs)
 
-    def __call__(self, *args, **kwargs):
+    def __call__(self, *args, **kwargs) -> Any:
         return self.transform(*args, **kwargs)
 
     def construct(self, *args, **kwargs) -> None:
@@ -78,7 +72,7 @@ class Transform(BaseObject, metaclass=ABCMeta):
         return
 
     @abstractmethod
-    def transform(self, *args, **kwargs):
+    def transform(self, *args, **kwargs) -> Any:
         """Transforms the given data
 
         Parameters

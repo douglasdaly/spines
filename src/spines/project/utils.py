@@ -5,6 +5,7 @@ Utility funtions for the project subpackage.
 import os
 from pathlib import Path
 
+from .base import Project
 from .settings import PROJECT_DIRNAME
 from .settings import PROJECT_FILE
 
@@ -86,5 +87,5 @@ def create_project_file(path: str) -> str:
     if os.path.exists(proj_file):
         raise FileExistsError(proj_file)
     new_proj = Project()
-
+    new_proj.save(proj_file)
     return proj_file
