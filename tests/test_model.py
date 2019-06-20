@@ -2,9 +2,6 @@
 """
 Unit tests for the Model class.
 """
-#
-#   Imports
-#
 import os
 import tempfile
 
@@ -13,22 +10,6 @@ import pytest
 from spines import utils
 
 from .helpers import get_line_model
-
-
-#
-#   Unit tests
-#
-
-@pytest.mark.usefixtures('class_line_model')
-class TestInitialization(object):
-    """
-    Tests for various model initialization code
-    """
-
-    @pytest.mark.parametrize('x, y', [(2.0, 2.5), (0.0, 1.0)])
-    def test_auto_score_func(self, x, y):
-        err_val = self.line_model.error(x, y)
-        assert self.line_model.score(x, y) == -err_val
 
 
 class TestFitFunctions(object):

@@ -34,7 +34,7 @@ class Transform(BaseObject, metaclass=ABCMeta):
         """
         return
 
-    def fit(self, *args, **kwargs) -> [Dict[str, object], None]:
+    def fit(self, *args, **kwargs) -> None:
         """Fits the parameters for this transformation
 
         Parameters

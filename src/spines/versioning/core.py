@@ -2,9 +2,6 @@
 """
 Core classes for the spines versioning subpackage.
 """
-#
-#   Imports
-#
 from collections import OrderedDict
 from textwrap import indent
 from types import FunctionType
@@ -33,10 +30,6 @@ from ..utils.string import INDENT_TAB
 from ..utils.string import format_code_style
 from .base import Signature
 
-
-#
-#   Classes
-#
 
 class FunctionSignature(Signature):
     """

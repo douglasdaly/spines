@@ -2,9 +2,6 @@
 """
 Mixin classes for versioning subpackage.
 """
-#
-#   Imports
-#
 from abc import ABC
 from abc import abstractmethod
 from hashlib import blake2s
@@ -17,10 +14,6 @@ from .. import __version__
 from ..utils.object import get_doc_string
 from ..utils.string import slugify
 
-
-#
-#   Mixins
-#
 
 class VersionMixin(ABC):
     """

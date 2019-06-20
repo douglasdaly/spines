@@ -3,6 +3,7 @@
 Model class for the spines package.
 """
 from abc import abstractmethod
+from typing import Any
 from typing import Dict
 from typing import List
 from typing import Type
@@ -124,7 +125,7 @@ class Model(Transform):
         """
         return self._hyper_parameters.pop(name)
 
-    def fit(self, *args, **kwargs) -> [None, Dict]:
+    def fit(self, *args, **kwargs) -> None:
         """Fits the model
 
         Generally this method is used for a single iteration of model
@@ -153,28 +154,6 @@ class Model(Transform):
 
         """
         return super().fit(*args, **kwargs)
-
-    def train(self, *args, **kwargs) -> None:
-        """Trains the model, iteratively
-
-        This is the main training routine method for the model class.
-        It's generally used for training models such as neural networks
-        where you'll want to iteratively update the model (via ``fit``
-        calls), potentially based on different hyper-parameter settings.
-
-        Parameters
-        ----------
-        args : optional
-            Arguments to use in train call.
-        kwargs : optional
-            Any additional keyword arguments to use in the train call.
-
-        See Also
-        --------
-        fit
-
-        """
-        return
 
     def transform(self, *args, **kwargs):
         """Transforms the given input data
@@ -213,24 +192,6 @@ class Model(Transform):
         """
         pass
 
-    def error(self, *args, **kwargs) -> float:
-        """Returns the error measure of the model for the given data
-
-        Parameters
-        ----------
-        args : optional
-            Additional arguments to pass to the error call.
-        kwargs : optional
-            Additional keyword-arguments to pass to the error call.
-
-        Returns
-        -------
-        float
-            Error for the model on the given inputs and outputs.
-
-        """
-        return
-
     def _save_helper(self, dir_path: str) -> List[str]:
         """Saves Model objects to the specified directory"""
         ret = super(Model, self)._save_helper(dir_path)
@@ -262,10 +223,6 @@ class Model(Transform):
 
         return
 
-
-#
-#   Exceptions
-#
 
 class ModelException(BaseObjectException):
     """
