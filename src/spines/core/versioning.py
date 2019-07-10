@@ -2,8 +2,11 @@
 """
 Versioning objects for core classes.
 """
-from typing import Dict
+from __future__ import annotations
+
+from typing import Mapping
 from typing import Type
+from typing import Union
 
 import parver
 
@@ -20,14 +23,16 @@ class BaseObjectSignature(ClassSignature):
     """
     Signature object for spines BaseObject objects.
     """
-    __base_cls__ = BaseObject
+    __base_cls__: Type[BaseObject] = BaseObject
 
-    def __init__(self, obj: Type[__base_cls__]) -> None:
+    def __init__(self, obj: Union[BaseObject, Type[BaseObject]]) -> None:
         self._params = self._get_parameters(obj)
         return super().__init__(obj)
 
     @classmethod
-    def _get_parameters(cls, obj: type) -> Dict[str, Type[Signature]]:
+    def _get_parameters(
+        cls, obj: Union[BaseObject, Type[BaseObject]]
+    ) -> Mapping[str, Signature]:
         """Gets the relevant parameters and their signatures"""
         if not isinstance(obj, type):
             obj = obj.__class__

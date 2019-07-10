@@ -2,16 +2,11 @@
 """
 Core Transform classes for manipulating data.
 """
-#
-#   Imports
-#
+from __future__ import annotations
+
 from ..parameters.base import Parameter
 from .base import Transform
 
-
-#
-#   Transform classes
-#
 
 class Pass(Transform):
     """

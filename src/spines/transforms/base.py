@@ -2,10 +2,13 @@
 """
 Base classes for transforms subpackage.
 """
+from __future__ import annotations
+
 from abc import ABCMeta
 from abc import abstractmethod
 from typing import Any
 from typing import Dict
+from typing import Union
 
 from ..core.base import BaseObject
 
@@ -34,7 +37,7 @@ class Transform(BaseObject, metaclass=ABCMeta):
         """
         return
 
-    def fit(self, *args, **kwargs) -> None:
+    def fit(self, *args, **kwargs) -> Union[None, Dict]:
         """Fits the parameters for this transformation
 
         Parameters

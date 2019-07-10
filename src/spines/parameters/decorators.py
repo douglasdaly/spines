@@ -2,11 +2,13 @@
 """
 Decorators for parameters module.
 """
+from __future__ import annotations
+
 from functools import wraps
-from typing import Type
+from typing import Callable
 
 
-def state_changed(func):
+def state_changed(func: Callable) -> Callable:
     """Decorator indicating a function which changes the state
 
     Parameters
@@ -28,7 +30,7 @@ def state_changed(func):
     return wrapped
 
 
-def finalize_pre(func, store: Type['ParameterStore']):
+def finalize_pre(func: Callable, store) -> Callable:
     """Finalizes the store prior to executing the function
 
     Parameters
@@ -58,7 +60,7 @@ def finalize_pre(func, store: Type['ParameterStore']):
     return wrapper
 
 
-def finalize_post(func, store: Type['ParameterStore']):
+def finalize_post(func: Callable, store) -> Callable:
     """Finalizes the store prior to executing the function
 
     Parameters

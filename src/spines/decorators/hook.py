@@ -2,17 +2,20 @@
 """
 Decorators for hooking functions.
 """
+from __future__ import annotations
+
 from functools import wraps
+from typing import Callable
 
 
 def add_callback(
-    callback: callable,
+    callback: Callable,
     *args,
     pass_args: bool = False,
     pass_kwargs: bool = False,
     pass_returned: bool = True,
     **kwargs
-) -> callable:
+) -> Callable:
     """Adds a the given callback to the function
 
     Parameters

@@ -2,10 +2,14 @@
 """
 Base classes for core spines library.
 """
+from __future__ import annotations
+
 from abc import ABC
 import tempfile
 from typing import List
+from typing import Mapping
 from typing import Type
+from typing import Union
 
 from ..decorators.mark import override
 from ..parameters.base import Parameter
@@ -22,7 +26,7 @@ class BaseObject(ABC):
     Base object class for all spines components
     """
     __version__ = None
-    __param_store__ = ParameterStore
+    __param_store__: Type[ParameterStore] = ParameterStore
 
     def __init__(self, *args, **kwargs) -> None:
         self._params = self._create_store(
@@ -41,7 +45,7 @@ class BaseObject(ABC):
         )
 
     @property
-    def parameters(self) -> Type[ParameterStore]:
+    def parameters(self) -> ParameterStore:
         """ParameterStore: Parameters in this object."""
         return self._params
 
@@ -62,7 +66,7 @@ class BaseObject(ABC):
         self._params.update(params)
         return
 
-    def get_params(self) -> dict:
+    def get_params(self) -> Mapping:
         """Gets a copy of this models parameters
 
         Returns
@@ -73,7 +77,7 @@ class BaseObject(ABC):
         """
         return self._params.values
 
-    def set_parameter(self, name: str, value) -> None:
+    def set_parameter(self, name: str, value: Any) -> None:
         """Sets a parameter value
 
         Will add the given `param` and `value` to the parameters if
@@ -99,7 +103,7 @@ class BaseObject(ABC):
         self._params[name] = value
         return
 
-    def unset_parameter(self, name: str) -> object:
+    def unset_parameter(self, name: str) -> Any:
         """Unsets a parameter value
 
         Removes the specified parameter's value from the parameter
@@ -130,7 +134,7 @@ class BaseObject(ABC):
         return self._params.pop(name)
 
     def save(
-        self, path: [None, str] = None, fmt: [None, str] = None
+        self, path: Union[None, str] = None, fmt: Union[None, str] = None
     ) -> str:
         """Saves this object to file
 
@@ -175,8 +179,8 @@ class BaseObject(ABC):
 
     @classmethod
     def load(
-        cls, path: str, fmt: [None, str] = None, new: bool = False
-    ) -> Type['BaseObject']:
+        cls, path: str, fmt: Union[None, str] = None, new: bool = False
+    ) -> BaseObject:
         """Loads an object from file
 
         Parameters
@@ -202,7 +206,7 @@ class BaseObject(ABC):
             return cls._load_helper(tmp_dir, new)
 
     @classmethod
-    def _load_helper(cls, dir_path: str, new: bool) -> Type['BaseObject']:
+    def _load_helper(cls, dir_path: str, new: bool) -> BaseObject:
         """Loads the various files into a new object"""
         if new:
             instance = cls()
@@ -221,7 +225,7 @@ class BaseObject(ABC):
         return
 
     @classmethod
-    def _create_store(cls, store_cls, param_cls) -> Type[ParameterStore]:
+    def _create_store(cls, store_cls, param_cls) -> ParameterStore:
         """Creates and instance of the parameter store"""
         store = store_cls()
         for attr in cls.__dict__.values():

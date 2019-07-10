@@ -2,20 +2,23 @@
 """
 Decorators related to marking objects and their attributes.
 """
+from __future__ import annotations
+
 from functools import wraps
+from typing import Callable
 
 
-def override(func):
+def override(func: Callable) -> Callable:
     """Marks the given function as overridden
 
     Parameters
     ----------
-    func : callable
+    func : Callable
         The function to mark as overridden.
 
     Returns
     -------
-    callable
+    Callable
         The new method with the overridden wrapper.
 
     """

@@ -2,6 +2,8 @@
 """
 Model class for the spines package.
 """
+from __future__ import annotations
+
 from abc import abstractmethod
 from typing import Any
 from typing import Dict
@@ -23,16 +25,16 @@ class Model(Transform):
     """
     Spines primary Model class
     """
-    __hyperparam_store__ = ParameterStore
+    __hyperparam_store__: Type[ParameterStore] = ParameterStore
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         self._hyper_params = self._create_store(
             self.__hyperparam_store__, HyperParameter
         )
         return super().__init__(*args, **kwargs)
 
     @property
-    def hyper_parameters(self) -> Type[ParameterStore]:
+    def hyper_parameters(self) -> ParameterStore:
         """ParameterStore: Hyper-parameters which are currently set."""
         return self._hyper_params
 
@@ -53,7 +55,7 @@ class Model(Transform):
         self._hyper_params.update(hyper_params)
         return
 
-    def get_hyper_params(self) -> Dict[str, object]:
+    def get_hyper_params(self) -> Dict[str, Any]:
         """Gets the current hyper-parameter values
 
         Returns
@@ -68,7 +70,7 @@ class Model(Transform):
         """
         return self._hyper_params.values
 
-    def set_hyper_parameter(self, name: str, value) -> None:
+    def set_hyper_parameter(self, name: str, value: Any) -> None:
         """Sets a hyper-parameter value
 
         Sets a hyper-parameter's value if the given `hyper_param` and
@@ -97,7 +99,7 @@ class Model(Transform):
         self._hyper_parameters[name] = value
         return
 
-    def unset_hyper_parameter(self, name: str):
+    def unset_hyper_parameter(self, name: str) -> Any:
         """Un-sets a hyper-parameter
 
         Un-sets the specified hyper-parameter's value from the set of
@@ -155,7 +157,7 @@ class Model(Transform):
         """
         return super().fit(*args, **kwargs)
 
-    def transform(self, *args, **kwargs):
+    def transform(self, *args, **kwargs) -> Any:
         """Transforms the given input data
 
         Parameters
@@ -174,7 +176,7 @@ class Model(Transform):
         return self.predict(*args, **kwargs)
 
     @abstractmethod
-    def predict(self, *args, **kwargs):
+    def predict(self, *args, **kwargs) -> Any:
         """Predict outputs for the given inputs
 
         Parameters
@@ -201,13 +203,13 @@ class Model(Transform):
         return ret
 
     @classmethod
-    def _load_helper(cls, dir_path: str, new: bool) -> Type['Model']:
+    def _load_helper(cls, dir_path: str, new: bool) -> Model:
         """Helper function for loading a Model from file"""
         instance = super(Model, cls)._load_helper(dir_path, new)
         instance._hyper_params = load_pickle(dir_path, 'hyperparameters')
         return instance
 
-    def _modify_methods(self, *args, **kwargs):
+    def _modify_methods(self, *args, **kwargs) -> None:
         """Modifies the model's functions in-place on object creation"""
         super(Model, self)._modify_methods(*args, **kwargs)
 

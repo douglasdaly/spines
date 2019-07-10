@@ -2,8 +2,12 @@
 """
 Base classes for model parameters.
 """
+from __future__ import annotations
+
 from abc import ABC
-from typing import Type
+from typing import Any
+from typing import List
+from typing import Tuple
 
 
 class Parameter(object):
@@ -21,7 +25,9 @@ class Parameter(object):
 
     """
 
-    def __init__(self, *value_type, default=None, desc: str = None):
+    def __init__(
+        self, *value_type, default: Any = None, desc: str = None
+    ) -> None:
         self._name = None
         self._desc = desc
 
@@ -40,7 +46,7 @@ class Parameter(object):
         self._default = default
         return
 
-    def __call__(self, value):
+    def __call__(self, value: Any) -> Any:
         try:
             if self._check_helper(value, raise_exceptions=True):
                 return value
@@ -71,11 +77,11 @@ class Parameter(object):
         self._name = name
         return
 
-    def __set__(self, instance: Type['spines.Model'], value) -> None:
+    def __set__(self, instance, value: Any) -> None:
         instance.parameters[self._name] = value
         return
 
-    def __get__(self, instance, owner):
+    def __get__(self, instance, owner) -> Any:
         return instance.parameters.get(self._name, None)
 
     @property
@@ -89,12 +95,12 @@ class Parameter(object):
         return self._desc
 
     @property
-    def value_type(self) -> tuple:
+    def value_type(self) -> Tuple:
         """tuple: The types of values allowed for this option."""
         return self._value_types
 
     @property
-    def default(self):
+    def default(self) -> Any:
         """object: Default value to use for this parameter."""
         return self._default
 
@@ -103,7 +109,7 @@ class Parameter(object):
         """bool: Whether or not this parameter is required to be set."""
         return self._required
 
-    def check(self, value) -> bool:
+    def check(self, value: Any) -> bool:
         """Checks the given `value` for validity
 
         Based on this particular Parameter's settings this method checks
@@ -126,7 +132,7 @@ class Parameter(object):
         """
         return self._check_helper(value, raise_exceptions=False)
 
-    def preprocess(self, value):
+    def preprocess(self, value: Any) -> Any:
         """Pre-process/massage parameter values into correct type
 
         This is used to try and convert parameter values to the allowed
@@ -187,7 +193,7 @@ class Parameter(object):
 
         return True
 
-    def _disp_props(self):
+    def _disp_props(self) -> List[str]:
         """Helper function to get properties to display in name string"""
         ret = list()
         if self.required:
@@ -202,11 +208,11 @@ class HyperParameter(Parameter):
     Hyper-parameter
     """
 
-    def __set__(self, instance: Type['spines.Model'], value) -> None:
+    def __set__(self, instance, value: Any) -> None:
         instance.hyper_parameters[self._name] = value
         return
 
-    def __get__(self, instance: Type['spines.Model'], owner):
+    def __get__(self, instance, owner) -> Any:
         return instance.hyper_parameters[self._name]
 
 
@@ -215,7 +221,7 @@ class ParameterMixin(ABC):
     Base mixin class for parameters
     """
 
-    def _check_helper(self, value, raise_exceptions: bool = True) -> bool:
+    def _check_helper(self, value: Any, raise_exceptions: bool = True) -> bool:
         """Helper function to check if the given value is valid."""
         return super(ParameterMixin, self)._check_helper(
             value, raise_exceptions=raise_exceptions

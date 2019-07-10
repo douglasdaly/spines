@@ -2,11 +2,13 @@
 """
 Decorators for Models
 """
+from __future__ import annotations
+
 from functools import wraps
 from typing import Callable
 
 
-def negate(func: Callable):
+def negate(func: Callable) -> Callable:
     """Negate's the given functions output
 
     Parameters
@@ -26,7 +28,7 @@ def negate(func: Callable):
     return _wrapper
 
 
-def inverse(func: Callable):
+def inverse(func: Callable) -> Callable:
     """Inverts the given function's output
 
     Parameters

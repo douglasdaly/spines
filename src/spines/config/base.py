@@ -2,20 +2,16 @@
 """
 Base configuration object for spines.
 """
-#
-#   Imports
-#
+from __future__ import annotations
+
 from collections import defaultdict
 from collections.abc import Mapping
 from collections.abc import MutableMapping
+from typing import Any
+from typing import Iterator
 from typing import List
 from typing import Tuple
-from typing import Type
 
-
-#
-#   Class definitions
-#
 
 class BaseConfig(MutableMapping):
     """
@@ -23,7 +19,7 @@ class BaseConfig(MutableMapping):
     """
     __storage_cls__ = None
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         if self.__storage_cls__ is None:
             self.__storage_cls__ = type(self)
         self._storage = defaultdict(self.__storage_cls__)
@@ -33,7 +29,7 @@ class BaseConfig(MutableMapping):
     def __repr__(self) -> str:
         return "{%s}" % ', '.join(["%s: %s" % (k, v) for k, v in self.items()])
 
-    def __getitem__(self, item: str):
+    def __getitem__(self, item: str) -> Any:
         if item is None:
             return
         key, sub_key = self._key_helper(item)
@@ -67,7 +63,7 @@ class BaseConfig(MutableMapping):
             del self._storage[key]
         return
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator:
         return iter(self._storage)
 
     def __len__(self) -> int:
@@ -84,7 +80,7 @@ class BaseConfig(MutableMapping):
             return sub_key in self._storage[key]
         return True
 
-    def __getattr__(self, name):
+    def __getattr__(self, name: str) -> Any:
         try:
             return super().__getattribute__(name)
         except AttributeError as ex:
@@ -94,7 +90,7 @@ class BaseConfig(MutableMapping):
                 raise ex
         return
 
-    def __setattr__(self, name, value):
+    def __setattr__(self, name: str, value: Any) -> None:
         if '_storage' not in self.__dict__ or name in self.__dict__:
             return super().__setattr__(name, value)
         return self.__setitem__(name, value)
@@ -104,7 +100,7 @@ class BaseConfig(MutableMapping):
         """type: Default storage class used for missing items."""
         return self._storage.default_factory
 
-    def copy(self) -> Type['BaseConfig']:
+    def copy(self) -> BaseConfig:
         """Creates a copy of this configuration object
 
         Returns

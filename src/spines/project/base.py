@@ -2,6 +2,8 @@
 """
 Base classes for the project subpackage.
 """
+from __future__ import annotations
+
 from typing import Mapping as T_Mapping
 from typing import Type
 
@@ -114,7 +116,7 @@ class Project(object):
         return path
 
     @classmethod
-    def load(cls, path: str) -> Type['Project']:
+    def load(cls, path: str) -> Project:
         """Loads a new :obj:`Project` object from file.
 
         Parameters

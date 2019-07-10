@@ -1,6 +1,6 @@
 # Spines
 
-*Skeletons for parameterized models.*
+*Backbones for parameterized models.*
 
 [![Build Status](https://travis-ci.org/douglasdaly/spines.svg?branch=master)](https://travis-ci.org/douglasdaly/spines)
 [![Coverage Status](https://coveralls.io/repos/github/douglasdaly/spines/badge.svg)](https://coveralls.io/github/douglasdaly/spines)
@@ -28,7 +28,7 @@ $ pipenv install spines
 ## About
 
 Spines is a library which provides a consistent (and hopefully familiar)
-framework for building predictive models.  It's core `Model` class
+framework for building parameterized models.  It's core `Model` class
 is similar, in structure, to some of scikit-learn's underlying Estimator
 classes - but with a single set of unified functions for all models,
 namely:

@@ -2,8 +2,11 @@
 """
 Core configuration subpackage functionality.
 """
+from __future__ import annotations
+
 from typing import Dict
 from typing import Type
+from typing import Union
 
 from .base import BaseConfig
 
@@ -12,7 +15,7 @@ class Config(BaseConfig):
     """
     Primary configuration class for spines.
     """
-    __storage_cls__ = BaseConfig
+    __storage_cls__: Type[BaseConfig] = BaseConfig
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -20,12 +23,12 @@ class Config(BaseConfig):
         return
 
     @property
-    def plugins(self) -> Dict[str, Type['PluginConfig']]:
+    def plugins(self) -> Dict[str, PluginConfig]:
         """dict: Plugin configurations in this configuration."""
         return self._plugins
 
     def add_plugin(
-        self, plugin: [str, Type['PluginConfig']], update: bool = False
+        self, plugin: Union[str, PluginConfig], update: bool = False
     ) -> None:
         """Adds a plugin configuration to this config object
 
@@ -51,7 +54,7 @@ class Config(BaseConfig):
             self._plugins[p_name] = plugin
         return
 
-    def remove_plugin(self, plugin: str) -> [Type['PluginConfig'], None]:
+    def remove_plugin(self, plugin: str) -> Union[PluginConfig, None]:
         """Removes a plugin configuration from this config object
 
         Parameters
@@ -72,9 +75,9 @@ class PluginConfig(BaseConfig):
     """
     Plugin configuration class for spines.
     """
-    __storage_cls__ = BaseConfig
+    __storage_cls__: Type[BaseConfig] = BaseConfig
 
-    def __init__(self, name, *args, **kwargs):
+    def __init__(self, name: str, *args, **kwargs) -> None:
         self._name = name
         return super().__init__(*args, **kwargs)
 

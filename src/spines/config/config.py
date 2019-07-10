@@ -2,9 +2,11 @@
 """
 Primary configuration interface
 """
+from __future__ import annotations
+
 from contextlib import contextmanager
+from typing import Any
 from typing import Tuple
-from typing import Type
 
 from .._vendored.boltons.typeutils import make_sentinel
 
@@ -14,13 +16,13 @@ from .core import Config
 
 _MISSING = make_sentinel(var_name='_MISSING')
 
-_GLOBAL_CONFIG = None
+_GLOBAL_CONFIG: Config = None
 
 
 def get_config(
     setting: str = _MISSING,
-    default=_MISSING
-) -> Type[Config]:
+    default: Any =_MISSING
+) -> Config:
     """Get the global spines configuration
 
     Parameters
@@ -72,7 +74,7 @@ def set_config(section: str = None, **settings) -> None:
     return
 
 
-def load_config(*path: Tuple[str], update: bool = False) -> None:
+def load_config(*path: Tuple[str, ...], update: bool = False) -> None:
     """Loads the global spines configuration
 
     Parameters
@@ -103,11 +105,11 @@ def load_config(*path: Tuple[str], update: bool = False) -> None:
 
 
 def _update_config(
-    config: Type[Config],
-    *other: Tuple[Type[Config]],
+    config: Config,
+    *other: Tuple[Config, ...],
     section: str = None,
     **settings
-) -> Type[Config]:
+) -> Config:
     """Updates the given configuration object"""
     updated = config.copy()
     for other_cfg in other:
@@ -123,7 +125,7 @@ def _update_config(
 
 
 @contextmanager
-def temp_config(section: str = None, **settings):
+def temp_config(section: str = None, **settings) -> None:
     """Temporary configuration context manager
 
     Parameters

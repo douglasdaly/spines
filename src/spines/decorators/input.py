@@ -2,13 +2,16 @@
 """
 Decorators for modifying function's inputs
 """
+from __future__ import annotations
+
 from functools import wraps
 from inspect import signature
 from typing import Tuple
+from typing import Type
 from typing import Union
 
 
-def to_class(*args: Tuple[Union[int, str], ...]) -> Tuple[type, ...]:
+def to_class(*args: Tuple[Union[int, str], ...]) -> Tuple[Type, ...]:
     """Converts input(s) to types from inputs specified
 
     Parameters

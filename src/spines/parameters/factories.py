@@ -2,10 +2,17 @@
 """
 Parameter factory functions
 """
+from __future__ import annotations
+
+from typing import Callable
+from typing import Type
+
 from .base import ParameterMixin
 
 
-def bound_mixin(name, checker, cls_name=None):
+def bound_mixin(
+    name: str, checker: Callable, cls_name: str = None
+) -> Type[ParameterMixin]:
     """Creates a new mixin class for bounded parameters
 
     This factory function makes creating bound mixins very simple, you only

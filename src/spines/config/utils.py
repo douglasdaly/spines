@@ -2,15 +2,13 @@
 """
 Utilities for the configuration subpackage.
 """
-#
-#   Imports
-#
+from __future__ import annotations
+
 import os
 from pathlib import Path
 from typing import Dict
 from typing import List
 from typing import Tuple
-from typing import Type
 
 import toml
 
@@ -67,7 +65,7 @@ def find_config_files(path: str) -> List[str]:
     return reversed(ret)
 
 
-def save_config(config: Type[Config], *path: Tuple[str]) -> str:
+def save_config(config: Config, *path: Tuple[str]) -> str:
     """Saves a configuration object to file
 
     Parameters
@@ -86,7 +84,7 @@ def save_config(config: Type[Config], *path: Tuple[str]) -> str:
     return _save_config_contents(config, *path)
 
 
-def load_config(path: str, config_cls: [Type, None] = None) -> Type[Config]:
+def load_config(path: str, config_cls: [Type[Config], None] = None) -> Config:
     """Loads a configuration from file
 
     Parameters
@@ -112,7 +110,7 @@ def load_config(path: str, config_cls: [Type, None] = None) -> Type[Config]:
     return loaded_cfg
 
 
-def save_plugin_config(config: Type[PluginConfig], *path: Tuple[str]) -> str:
+def save_plugin_config(config: PluginConfig, *path: Tuple[str]) -> str:
     """Saves a plugin configuration to file
 
     Parameters
@@ -132,8 +130,8 @@ def save_plugin_config(config: Type[PluginConfig], *path: Tuple[str]) -> str:
 
 
 def load_plugin_config(
-    path: str, config_cls: [Type, None] = None
-) -> Type[PluginConfig]:
+    path: str, config_cls: [Type[Config], None] = None
+) -> PluginConfig:
     """Loads a plugin configuration from file
 
     Parameters
@@ -156,7 +154,7 @@ def load_plugin_config(
 
 
 def _save_config_contents(
-    config: Type['BaseConfig'], *path: Tuple[str]
+    config: BaseConfig, *path: Tuple[str, ...]
 ) -> str:
     """Saves the given configuration to file"""
     path = os.path.join(path)
