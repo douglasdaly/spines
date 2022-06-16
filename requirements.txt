@@ -39,7 +39,7 @@ more-itertools==7.0.0 ; python_version > '2.7'
 nbconvert==5.4.1
 nbformat==4.4.0
 nbsphinx==0.4.2
-notebook==5.7.8
+notebook==6.4.12
 packaging==19.0
 pandoc==1.0.2
 pandocfilters==1.4.2
